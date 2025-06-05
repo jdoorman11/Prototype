@@ -82,77 +82,578 @@
 
   // Specifieke JSON data voor Publicatiecontrole
   const decisionTreesData = [
+{
+  "flowName": "Publicatiecontrole",
+  "startNodeId": "P1",
+  "nodes": [
     {
-      "flowName": "Publicatiecontrole",
-      "startNodeId": "C-W1",
-      "nodes": [
+      "id": "P1",
+      "type": "question",
+      "text": "Brengt openbaarmaking de eenheid van de Kroon in gevaar?",
+      "answers": [
         {
-          "id": "C-W1",
-          "type": "question",
-          "text": "Bevat het document vertrouwelijke bedrijfsinformatie?",
-          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW1_Ja_Nietopenbaar" }, { "text": "Nee", "nextNodeId": "C-W2" } ],
-          "metadata": { "waarom": "Vertrouwelijke bedrijfsgegevens mogen niet worden gedeeld zonder toestemming.", "citaat": "“De overheid maakt geen bedrijfsgeheimen openbaar die vertrouwelijk door bedrijven of personen zijn gedeeld.”", "artikelOfRichtlijn": "Woo art. 5.1 lid 1 sub c", "toelichting": "Vertrouwelijke bedrijfsinformatie hoeft niet openbaar te worden gemaakt." }
-        },
-        { "id": "CONCL_CW1_Ja_Nietopenbaar", "type": "conclusion", "text": "Niet openbaar", "metadata": {} },
-        {
-          "id": "C-W2",
-          "type": "question",
-          "text": "Bevat het document persoonsgegevens zoals namen of BSN?",
-          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW2_Ja_Anonimiserenof toestemmingvragen" }, { "text": "Nee", "nextNodeId": "C-W3" } ],
-          "metadata": { "waarom": "Persoonsgegevens mogen alleen worden gedeeld met toestemming of als ze al openbaar zijn.", "citaat": "\"“Persoonsgegevens worden niet openbaar, tenzij de persoon toestemming geeft of ze zelf al openbaar heeft gemaakt.”\"", "artikelOfRichtlijn": "Woo art. 5.1 lid 1 sub d", "toelichting": "Persoonsgegevens mogen alleen openbaar worden als ze zijn geanonimiseerd of met toestemming." }
-        },
-        { "id": "CONCL_CW2_Ja_Anonimiserenof toestemmingvragen", "type": "conclusion", "text": "Anonimiseren of toestemming vragen", "metadata": {} },
-        {
-          "id": "C-W3",
-          "type": "question",
-          "text": "Bevat het document informatie die internationale betrekkingen kan schaden?",
-          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW3_Ja_Nietopenbaar" }, { "text": "Nee", "nextNodeId": "C-W4" } ],
-          "metadata": { "waarom": "Schade aan internationale relaties is een geldige weigeringsgrond.", "citaat": "“Informatie mag geheim blijven als publicatie de relatie met andere landen of internationale organisaties schaadt.”", "artikelOfRichtlijn": "Woo art. 5.1 lid 2 sub a", "toelichting": "Informatie die internationale betrekkingen schaadt, hoeft niet openbaar te worden gemaakt." }
-        },
-        { "id": "CONCL_CW3_Ja_Nietopenbaar", "type": "conclusion", "text": "Niet openbaar", "metadata": {} },
-        {
-          "id": "C-W4",
-          "type": "question",
-          "text": "Bevat het document persoonlijke beleidsopvattingen van ambtenaren of bestuurders?",
-          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW4_Ja_Anonimiseren" }, { "text": "Nee", "nextNodeId": "C-W5" } ],
-          "metadata": { "waarom": "Beleidsoverwegingen zijn intern en hoeven niet openbaar tenzij anoniem.", "citaat": "\"“Meningen en adviezen van ambtenaren hoeven niet openbaar te worden, behalve als ze anoniem zijn en het beleid ondersteunen.”\"", "artikelOfRichtlijn": "Woo art. 5.2", "toelichting": "Interne beleidsopvattingen mogen alleen openbaar worden gemaakt als ze niet tot een persoon zijn te herleiden." }
-        },
-        { "id": "CONCL_CW4_Ja_Anonimiseren", "type": "conclusion", "text": "Anonimiseren", "metadata": {} },
-        {
-          "id": "C-W5",
-          "type": "question",
-          "text": "Gaat het om milieu-informatie, zoals over uitstoot of vervuiling?",
-          "answers": [ { "text": "Ja", "nextNodeId": "C-W6" }, { "text": "Nee", "nextNodeId": "C-W7" } ],
-          "metadata": { "waarom": "Voor milieu-informatie gelden strengere eisen voor geheimhouding.", "citaat": "“Bij milieu-informatie zijn de regels strenger: die moet vaker wél openbaar worden.”", "artikelOfRichtlijn": "Woo art. 5.1 lid 5", "toelichting": "Milieu-informatie mag alleen worden geweigerd als openbaarmaking echt ernstige schade zou doen." }
+          "text": "Ja",
+          "nextNodeId": "CONCL_1"
         },
         {
-          "id": "C-W6",
-          "type": "question",
-          "text": "Is de milieu-informatie bedrijfsgevoelig en zou openbaarmaking ernstige schade doen?",
-          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW6_Ja_Nietopenbaar" }, { "text": "Nee", "nextNodeId": "C-W7" } ],
-          "metadata": { "waarom": "Alleen bij ernstige schade mag milieu-info geheim blijven.", "citaat": "“Milieu-informatie mag alleen geheim blijven als het delen ervan ernstige schade aan bedrijven veroorzaakt.”", "artikelOfRichtlijn": "Woo art. 5.1 lid 5", "toelichting": "Milieu-informatie mag alleen worden geweigerd als openbaarmaking echt ernstige schade zou doen." }
-        },
-        { "id": "CONCL_CW6_Ja_Nietopenbaar", "type": "conclusion", "text": "Niet openbaar", "metadata": {} },
+          "text": "Nee",
+          "nextNodeId": "P2"
+        }
+      ],
+      "metadata": {
+        "waarom": "Beschermt de samenwerking tussen koning en ministers",
+        "citaat": "de eenheid van de Kroon in gevaar zou kunnen brengen",
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub a",
+        "toelichting": "Bijvoorbeeld vertrouwelijke communicatie tussen Koning en ministers."
+      }
+    },
+    {
+      "id": "P2",
+      "type": "question",
+      "text": "Kan openbaarmaking de veiligheid van de Staat schaden?",
+      "answers": [
         {
-          "id": "C-W7",
-          "type": "question",
-          "text": "Zou openbaarmaking onevenredige schade toebrengen aan andere belangen?",
-          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW7_Ja_Nietopenbaar" }, { "text": "Nee", "nextNodeId": "C-W8" } ],
-          "metadata": { "waarom": "Er is een afweging nodig tussen belang van openbaarheid en schade.", "citaat": "“Informatie mag geheim blijven als openbaarheid te veel schade doet aan belangen die zwaarder wegen dan transparantie.”", "artikelOfRichtlijn": "Woo art. 5.1 lid 3", "toelichting": "Openbaarmaking mag achterwege blijven bij onevenredige schade aan andere belangen." }
+          "text": "Ja",
+          "nextNodeId": "CONCL_1"
         },
-        { "id": "CONCL_CW7_Ja_Nietopenbaar", "type": "conclusion", "text": "Niet openbaar", "metadata": {} },
         {
-          "id": "C-W8",
-          "type": "question",
-          "text": "Heeft een private partij toestemming gegeven voor publicatie van gevoelige informatie?",
-          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW8_Ja_ResultaatDocumentopenbaar" }, { "text": "Nee", "nextNodeId": "CONCL_CW8_Nee_Toestemmingvragenofanonimiseren" } ],
-          "metadata": { "waarom": "Zonder toestemming mag gevoelige info niet worden gedeeld.", "citaat": "“Voor gevoelige informatie van bedrijven of andere partijen is toestemming vereist voor publicatie.”", "artikelOfRichtlijn": "Richtlijn publicatie", "toelichting": "Bij gevoelige informatie van derden is toestemming vereist voor publicatie." }
+          "text": "Nee",
+          "nextNodeId": "P3"
+        }
+      ],
+      "metadata": {
+        "waarom": "Voorkomt gevaar voor Nederland",
+        "citaat": "de veiligheid van de Staat zou kunnen schaden",
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub b",
+        "toelichting": "Bijvoorbeeld militaire operaties, terrorismebestrijding."
+      }
+    },
+    {
+      "id": "P3",
+      "type": "question",
+      "text": "Bevat het document vertrouwelijke bedrijfs‑ of fabricagegegevens van derden?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "CONCL_1"
         },
-        { "id": "CONCL_CW8_Ja_ResultaatDocumentopenbaar", "type": "conclusion", "text": "Document openbaar", "metadata": { "tag": "Document openbaar"} }, // Tag toegevoegd voor consistentie
-        { "id": "CONCL_CW8_Nee_Toestemmingvragenofanonimiseren", "type": "conclusion", "text": "Toestemming vragen of anonimiseren", "metadata": {} }
-      ]
+        {
+          "text": "Nee",
+          "nextNodeId": "P4"
+        }
+      ],
+      "metadata": {
+        "waarom": "Voorkomt dat bedrijfsgeheimen uitlekken",
+        "citaat": "bedrijfs- en fabricagegegevens ... vertrouwelijk meegedeeld",
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub c",
+        "toelichting": "Denk aan geheime recepturen of aanbestedingsprijzen."
+      }
+    },
+    {
+      "id": "P4",
+      "type": "question",
+      "text": "Bevat het document bijzondere persoonsgegevens (UAVG §3.1 / §3.2)?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P4b"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P5"
+        }
+      ],
+      "metadata": {
+        "waarom": "Beschermt iemands privacy",
+        "citaat": "tenzij de betrokkene uitdrukkelijk toestemming heeft gegeven ... of kennelijk openbaar",
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub d",
+        "toelichting": "Bijvoorbeeld gezondheidsgegevens, politieke opvattingen."
+      }
+    },
+    {
+      "id": "P4b",
+      "type": "question",
+      "text": "Is er toestemming gegeven of is de data geanonimiseerd?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P5"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "CONCL_2"
+        }
+      ],
+      "metadata": {
+        "waarom": "Alleen met toestemming of na anonimiseren mogen bijzondere persoonsgegevens openbaar",
+        "citaat": null,
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub d / AVG",
+        "toelichting": "Bijzondere persoonsgegevens mogen niet openbaar zonder toestemming. Anonimiseren kan uitkomst bieden."
+      }
+    },
+    {
+      "id": "P5",
+      "type": "question",
+      "text": "Bevat het document wettelijk voorgeschreven identificatienummers (bijv. BSN)?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P5b"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P6"
+        }
+      ],
+      "metadata": {
+        "waarom": "Voorkomt dat iemands privégegevens openbaar worden",
+        "citaat": "tenzij de verstrekking kennelijk geen inbreuk op de levenssfeer maakt",
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub e",
+        "toelichting": "Bijvoorbeeld studentnummers, kentekens – alleen delen als privacy niet wordt geschaad."
+      }
+    },
+    {
+      "id": "P5b",
+      "type": "question",
+      "text": "Is het mogelijk de identificerende gegevens te anonimiseren?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P6"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "CONCL_3"
+        }
+      ],
+      "metadata": {
+        "waarom": "Anonimiseren voorkomt inbreuk op privacy",
+        "citaat": null,
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub e",
+        "toelichting": "Als identificerende gegevens verwijderd kunnen worden, kan het document openbaar."
+      }
+    },
+    {
+      "id": "P6",
+      "type": "question",
+      "text": "Is het document verkregen bij strafrechtelijke handhaving/toezicht én bestaat er een specifieke geheimhoudingsplicht?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P6b"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P7"
+        }
+      ],
+      "metadata": {
+        "waarom": "Een andere wet verbiedt openbaarmaking",
+        "citaat": "informatie verkregen ... waarvoor een specifieke wettelijke regeling geldt",
+        "artikelOfRichtlijn": "Art. 5.1 lid 2",
+        "toelichting": "Bijvoorbeeld politiegegevens, fiscale inlichtingen."
+      }
+    },
+    {
+      "id": "P6b",
+      "type": "question",
+      "text": "Bevat het document vertrouwelijke beleidsinformatie?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "CONCL_1"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "CONCL_4"
+        }
+      ],
+      "metadata": {
+        "waarom": "Vertrouwelijke beleidsinformatie mag worden geweigerd",
+        "citaat": null,
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub f",
+        "toelichting": "Denk aan informatie over intern beraad of beleidsvorming."
+      }
+    },
+    {
+      "id": "P7",
+      "type": "question",
+      "text": "Moet de geadresseerde de informatie eerst ontvangen (recht op voorinzage)?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P7b"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P8"
+        }
+      ],
+      "metadata": {
+        "waarom": "Betrokkene mag eerst het document zien",
+        "citaat": "belang ... om als eerste kennis te nemen",
+        "artikelOfRichtlijn": "Art. 5.1 lid 4",
+        "toelichting": "Bijvoorbeeld rapport dat eerst aan betrokken bedrijf wordt gestuurd."
+      }
+    },
+    {
+      "id": "P7b",
+      "type": "question",
+      "text": "Kan de schade voor derden worden voorkomen door anonimisering?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P8"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "CONCL_5"
+        }
+      ],
+      "metadata": {
+        "waarom": "Beschermt belangen van derden",
+        "citaat": null,
+        "artikelOfRichtlijn": "Art. 5.1 lid 2 sub a",
+        "toelichting": "Onevenredige schade voor derden kan reden zijn om openbaarmaking te weigeren, tenzij anonimisering helpt."
+      }
+    },
+    {
+      "id": "P8",
+      "type": "question",
+      "text": "Leidt openbaarmaking tot onevenredige benadeling van een ander belang dan lid 1/2?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P8b"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P9"
+        }
+      ],
+      "metadata": {
+        "waarom": "Er zou uitzonderlijk grote schade ontstaan",
+        "citaat": "onevenredige benadeling ... niet genoemd in het eerste of tweede lid",
+        "artikelOfRichtlijn": "Art. 5.1 lid 5",
+        "toelichting": "Alleen gebruiken bij uitzonderlijke, zwaarwegende belangen."
+      }
+    },
+    {
+      "id": "P8b",
+      "type": "question",
+      "text": "Kan het bestuursorgaan worden beschermd via gedeeltelijke openbaarmaking?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P9"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "CONCL_6"
+        }
+      ],
+      "metadata": {
+        "waarom": "Beperkt de schade voor bestuursorganen",
+        "citaat": null,
+        "artikelOfRichtlijn": "Art. 5.2 lid 1 sub b",
+        "toelichting": "Soms kan een deel van de informatie openbaar, zonder schade aan de overheid."
+      }
+    },
+    {
+      "id": "P9",
+      "type": "question",
+      "text": "Bevat het milieu‑informatie met bedrijfsgeheimen en is de schade bij openbaarmaking ernstig?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P9b"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P10"
+        }
+      ],
+      "metadata": {
+        "waarom": "Voorkomt dat bedrijfsgeheim over milieu‑stof uitlekt",
+        "citaat": "voor zover ... ernstig geschaad wordt en belang openbaarheid niet opweegt",
+        "artikelOfRichtlijn": "Art. 5.1 lid 6",
+        "toelichting": "Bijvoorbeeld exacte samenstelling giftig product."
+      }
+    },
+    {
+      "id": "P9b",
+      "type": "question",
+      "text": "Is het risico op belemmering van opsporing te beperken door weglatingen?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P10"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "CONCL_7"
+        }
+      ],
+      "metadata": {
+        "waarom": "Beschermt lopende onderzoeken",
+        "citaat": null,
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub g",
+        "toelichting": "Sommige info kan achterwege blijven om opsporing niet te hinderen."
+      }
+    },
+    {
+      "id": "P10",
+      "type": "question",
+      "text": "Gaat de informatie over emissies in het milieu?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "CONCL_8"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P11"
+        }
+      ],
+      "metadata": {
+        "waarom": "Uitstootgegevens moeten altijd openbaar zijn",
+        "citaat": "Het eerste en tweede lid zijn niet van toepassing ... emissies in het milieu",
+        "artikelOfRichtlijn": "Art. 5.1 lid 7",
+        "toelichting": "CO2-uitstoot, lozingen in water/grond – mag niet op lid 1/2 worden geweigerd."
+      }
+    },
+    {
+      "id": "P11",
+      "type": "question",
+      "text": "Bevat het document persoonlijke beleidsopvattingen voor intern beraad?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "CONCL_1"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P12"
+        }
+      ],
+      "metadata": {
+        "waarom": "Ambtenaren moeten vrij kunnen overleggen",
+        "citaat": "geen informatie ... over daarin opgenomen persoonlijke beleidsopvattingen",
+        "artikelOfRichtlijn": "Art. 5.2 lid 1",
+        "toelichting": "Meningen, adviezen, overwegingen worden afgeschermd."
+      }
+    },
+    {
+      "id": "P12",
+      "type": "question",
+      "text": "Kunnen persoonlijke beleidsopvattingen geanonimiseerd worden verstrekt?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "CONCL_1"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P13"
+        }
+      ],
+      "metadata": {
+        "waarom": "Helpt burgers controleren wat de overheid doet",
+        "citaat": "informatie ... in niet tot personen herleidbare vorm",
+        "artikelOfRichtlijn": "Art. 5.2 lid 2",
+        "toelichting": "Naam en functie weglaten; inhoud tonen."
+      }
+    },
+    {
+      "id": "P13",
+      "type": "question",
+      "text": "Heeft de auteur ingestemd met herkenbare openbaarmaking?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P14"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "CONCL_9"
+        }
+      ],
+      "metadata": {
+        "waarom": "De persoon heeft zelf toestemming gegeven",
+        "citaat": "Indien ... heeft ingestemd",
+        "artikelOfRichtlijn": "Art. 5.2 lid 2",
+        "toelichting": "Soms wil een expert bij naam genoemd worden."
+      }
+    },
+    {
+      "id": "P14",
+      "type": "question",
+      "text": "Is het document opgesteld voor formele besluitvorming door bestuurders (minister, burgemeester, GS, etc.)?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P14b"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P15"
+        }
+      ],
+      "metadata": {
+        "waarom": "Democratische controle op bestuurders",
+        "citaat": "informatie ... tenzij het kunnen voeren van intern beraad onevenredig wordt geschaad",
+        "artikelOfRichtlijn": "Art. 5.2 lid 3",
+        "toelichting": "Toets of publicatie intern overleg ernstig hindert."
+      }
+    },
+    {
+      "id": "P14b",
+      "type": "question",
+      "text": "Bevat het persoonlijke beleidsopvattingen?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P14c"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P15"
+        }
+      ],
+      "metadata": {
+        "waarom": "Bedrijfsgeheimen mogen worden beschermd, maar publicatie is soms mogelijk met aanpassing",
+        "citaat": null,
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub c",
+        "toelichting": "Gevoelige info kan vaak weggelaten worden om toch openbaar te maken"
+      }
+    },
+    {
+      "id": "P14c",
+      "type": "question",
+      "text": "Beschaden deze persoonlijke beleidsopvattingen intern beraad?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "CONCL_1"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "P15"
+        }
+      ],
+      "metadata": {
+        "waarom": "Bedrijfsgeheimen mogen worden beschermd, maar publicatie is soms mogelijk met aanpassing",
+        "citaat": null,
+        "artikelOfRichtlijn": "Art. 5.1 lid 1 sub c",
+        "toelichting": "Gevoelige info kan vaak weggelaten worden om toch openbaar te maken"
+      }
+    },
+    {
+      "id": "P15",
+      "type": "question",
+      "text": "Bevat het document persoonlijke beleidsopvattingen over milieu‑informatie?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "P15b"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "CONCL_8"
+        }
+      ],
+      "metadata": {
+        "waarom": "Openheid over milieu weegt zwaarder",
+        "citaat": "belang ... afgewogen tegen het belang van openbaarmaking",
+        "artikelOfRichtlijn": "Art. 5.2 lid 4",
+        "toelichting": "Milieukwesties krijgen voorkeur voor openbaarheid."
+      }
+    },
+    {
+      "id": "P15b",
+      "type": "question",
+      "text": "Heeft de auteur ingestemd met herkenbare publicatie van deze milieu‑opvatting?",
+      "answers": [
+        {
+          "text": "Ja",
+          "nextNodeId": "CONCL_8"
+        },
+        {
+          "text": "Nee",
+          "nextNodeId": "CONCL_10"
+        }
+      ],
+      "metadata": {
+        "waarom": "De persoon heeft zelf toestemming gegeven",
+        "citaat": "Indien ... heeft ingestemd",
+        "artikelOfRichtlijn": "Art. 5.2 lid 4",
+        "toelichting": "Bijvoorbeeld wetenschapper wil bij naam genoemd worden."
+      }
+    },
+    {
+      "id": "CONCL_1",
+      "type": "conclusion",
+      "text": "Niet openbaar",
+      "metadata": {}
+    },
+    {
+      "id": "CONCL_2",
+      "type": "conclusion",
+      "text": "Toestemming vragen of data anonimiseren",
+      "metadata": {}
+    },
+    {
+      "id": "CONCL_3",
+      "type": "conclusion",
+      "text": "Beperk openbaarmaking tot niet-identificeerbare delen",
+      "metadata": {}
+    },
+    {
+      "id": "CONCL_4",
+      "type": "conclusion",
+      "text": "Beoordeel of delen openbaar kunnen",
+      "metadata": {}
+    },
+    {
+      "id": "CONCL_5",
+      "type": "conclusion",
+      "text": "Beoordeel mogelijkheid tot anonimisering",
+      "metadata": {}
+    },
+    {
+      "id": "CONCL_6",
+      "type": "conclusion",
+      "text": "Beoordeel of gedeeltelijke openbaarmaking mogelijk is",
+      "metadata": {}
+    },
+    {
+      "id": "CONCL_7",
+      "type": "conclusion",
+      "text": "Overweeg delen te schrappen om risico te beperken",
+      "metadata": {}
+    },
+    {
+      "id": "CONCL_8",
+      "type": "conclusion",
+      "text": "Openbaar",
+      "metadata": {}
+    },
+    {
+      "id": "CONCL_9",
+      "type": "conclusion",
+      "text": "Toestemming vragen",
+      "metadata": {}
+    },
+    {
+      "id": "CONCL_10",
+      "type": "conclusion",
+      "text": "Weeg openbaarheid af tegen privacybelang",
+      "metadata": {}
     }
-  ];
+  ]
+}
+];
+
 
   // Globale variabelen voor de wizard-status
   let currentFlowName = null;
