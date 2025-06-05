@@ -82,6 +82,15 @@
           <!-- Wordt via JS gevuld -->
         </tbody>
       </table>
+      <div id="dashboard" class="dashboard" aria-live="polite">
+        <div class="progress"><div class="progress-bar"></div></div>
+        <p>
+          Gepubliceerd: <span id="published-percentage">0</span>%
+          (<span id="published-count">0</span> van
+          <span id="total-count">0</span>) • Niet gepubliceerd:
+          <span id="unpublished-percentage">0</span>%
+        </p>
+      </div>
     </section>
   </main>
 
@@ -95,6 +104,7 @@
       // Use relative URL to avoid CORS issues
       const url = '/api/documents';
       const tbody = document.querySelector('.dynamic-table tbody');
+      const dashboard = document.getElementById('dashboard');
       
       try {
         const resp = await fetch(url);
@@ -105,8 +115,17 @@
         
         if (items.length === 0) {
           tbody.innerHTML = '<tr><td colspan="4">Geen documenten gevonden.</td></tr>';
+          dashboard.querySelector('.progress-bar').style.width = '0%';
+          dashboard.querySelector('#published-count').textContent = '0';
+          dashboard.querySelector('#total-count').textContent = '0';
+          dashboard.querySelector('#published-percentage').textContent = '0';
+          dashboard.querySelector('#unpublished-percentage').textContent = '0';
           return;
         }
+
+        const totalCount = items.length;
+        const publishedCount = items.filter(d => String(d.status).toLowerCase() === 'gepubliceerd').length;
+        updateDashboard(publishedCount, totalCount);
         
         items.forEach(doc => {
           // Skip addendums as they'll be shown under their parent
@@ -260,6 +279,16 @@
 
     // Load data when the page loads
     document.addEventListener('DOMContentLoaded', loadDynamic);
+
+    function updateDashboard(published, total) {
+      const percentage = total ? Math.round((published / total) * 100) : 0;
+      const dashboard = document.getElementById('dashboard');
+      dashboard.querySelector('#published-count').textContent = String(published);
+      dashboard.querySelector('#total-count').textContent = String(total);
+      dashboard.querySelector('#published-percentage').textContent = String(percentage);
+      dashboard.querySelector('#unpublished-percentage').textContent = String(100 - percentage);
+      dashboard.querySelector('.progress-bar').style.width = percentage + '%';
+    }
   </script>
   
   <style>
@@ -328,6 +357,16 @@
     .addendum-item:hover {
       text-decoration: underline;
       color: #0052cc;
+    }
+
+    .dashboard {
+      max-width: 960px;
+      margin: var(--space-lg) auto;
+      text-align: center;
+    }
+
+    .dashboard .progress {
+      margin-bottom: var(--space-sm);
     }
   </style>
 </body>
