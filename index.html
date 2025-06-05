@@ -37,6 +37,24 @@
     }
   </script>
   <script src="/js/load-components.js"></script>
+  <style>
+    .wizard-section {
+      text-align: center;
+      margin: var(--space-md) 0;
+    }
+    .wizard-home-link {
+      display: inline-block;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .wizard-home-link:hover {
+      background: #00437d;
+    }
+  </style>
 </head>
 <body>
   <!-- Header component will be loaded here -->
@@ -64,6 +82,9 @@
           <option value="In bewerking">In bewerking</option>
         </select>
       </form>
+    </section>
+    <section class="wizard-section">
+      <a href="wizard.html" class="wizard-home-link">Ik heb geen document maar wil toch de wizard doorlopen</a>
     </section>
 
     <!-- ======================
