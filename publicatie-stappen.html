@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wizard – Publicatiecontrole</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    /* --- mobielvriendelijke basisopmaak --- */
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 0 1rem; color: #212529; }
+    header, footer { max-width: 720px; margin: 0 auto; padding: 1.5rem 0; text-align: center; }
+    header h1 { margin: 0; font-size: 1.75rem; color: #005da9; }
+    header p { margin: .25rem 0 1rem; font-size: 1rem; color: #555; }
+    .wizard { max-width: 720px; margin: 0 auto 2rem auto; background: #fff; border: 1px solid #e1e4e8; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 5px rgba(0,0,0,.07); }
+    .wizard-question { font-weight: 600; font-size: 1.2rem; margin: 0 0 1rem; color: #333; }
+    .wizard-buttons { display: flex; flex-direction: column; gap: .75rem; }
+    .wizard-buttons button {
+        padding: .75rem 1.25rem; font-size: 1rem; border: 1px solid transparent; border-radius: 6px;
+        color: #fff; font-weight: 600; cursor: pointer; transition: opacity .15s, background-color .15s;
+        text-align: center;
+    }
+    .wizard-buttons button:hover { opacity: .9; }
+
+    .btn-yes { background-color: #28a745; border-color: #28a745; }
+    .btn-yes:hover { background-color: #218838; }
+    .btn-no { background-color: #dc3545; border-color: #dc3545; }
+    .btn-no:hover { background-color: #c82333; }
+    .btn-neutral { background-color: #007bff; border-color: #007bff; }
+    .btn-neutral:hover { background-color: #0069d9; }
+    
+    .summary { background: #eef2f6; padding: 1.25rem; border-radius: 6px; margin-top: 2rem; font-size: .95rem; line-height: 1.5; border-left: 4px solid #005da9; }
+    .summary strong { display: block; margin-bottom: .5rem; font-size: 1.05rem; color: #005da9;}
+    .summary ul { padding-left: 20px; margin: 0; }
+    .summary li { margin-bottom: .25rem; }
+
+    .metadata-info {
+        background: #f9f9f9; padding: .75rem 1rem; border-radius: 4px; margin: 1rem 0 1.5rem 0;
+        font-size: .9rem; line-height: 1.5; border-left: 3px solid #007bff;
+    }
+    .metadata-info p { margin: .5rem 0; }
+    .metadata-info strong { color: #333; }
+    .metadata-info em { color: #555; }
+
+    .conclusion-text { font-size: 1.1rem; font-weight: 500; margin-bottom: 1rem; }
+    .conclusion-section h2 { font-size: 1.4rem; color: #005da9; margin-bottom: .75rem; }
+
+    /* Modal styles */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.6); display: flex;
+        justify-content: center; align-items: center; z-index: 1000;
+        opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-content {
+        background-color: white; padding: 25px 30px; border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.25); text-align: left;
+        min-width: 320px; max-width: 500px; width: 90%;
+        transform: scale(0.95); transition: transform 0.3s ease;
+    }
+    .modal-overlay.active .modal-content { transform: scale(1); }
+    .modal-content h3 { margin-top: 0; font-size: 1.3rem; color: #333; }
+    .modal-content p { margin-bottom: 1.5rem; font-size: 1rem; line-height: 1.5; color: #555;}
+    .modal-content button { float: right; }
+  </style>
+</head>
+<body>
+  <!-- Universal header will be loaded here -->
+  <header data-component="header"></header>
+  <div class="container">
+
+  <main class="wizard" id="wizardContainer" aria-live="polite">
+    </main>
+
+  <footer>
+    Prototype wizard • Juni 2025
+  </div>
+  </div>
+
+  <script src="/js/load-components.js"></script>
+  <script>
+
+  // Specifieke JSON data voor Publicatiecontrole
+  const decisionTreesData = [
+    {
+      "flowName": "Publicatiecontrole",
+      "startNodeId": "C-W1",
+      "nodes": [
+        {
+          "id": "C-W1",
+          "type": "question",
+          "text": "Bevat het document vertrouwelijke bedrijfsinformatie?",
+          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW1_Ja_Nietopenbaar" }, { "text": "Nee", "nextNodeId": "C-W2" } ],
+          "metadata": { "waarom": "Vertrouwelijke bedrijfsgegevens mogen niet worden gedeeld zonder toestemming.", "citaat": "“De overheid maakt geen bedrijfsgeheimen openbaar die vertrouwelijk door bedrijven of personen zijn gedeeld.”", "artikelOfRichtlijn": "Woo art. 5.1 lid 1 sub c", "toelichting": "Vertrouwelijke bedrijfsinformatie hoeft niet openbaar te worden gemaakt." }
+        },
+        { "id": "CONCL_CW1_Ja_Nietopenbaar", "type": "conclusion", "text": "Niet openbaar", "metadata": {} },
+        {
+          "id": "C-W2",
+          "type": "question",
+          "text": "Bevat het document persoonsgegevens zoals namen of BSN?",
+          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW2_Ja_Anonimiserenof toestemmingvragen" }, { "text": "Nee", "nextNodeId": "C-W3" } ],
+          "metadata": { "waarom": "Persoonsgegevens mogen alleen worden gedeeld met toestemming of als ze al openbaar zijn.", "citaat": "\"“Persoonsgegevens worden niet openbaar, tenzij de persoon toestemming geeft of ze zelf al openbaar heeft gemaakt.”\"", "artikelOfRichtlijn": "Woo art. 5.1 lid 1 sub d", "toelichting": "Persoonsgegevens mogen alleen openbaar worden als ze zijn geanonimiseerd of met toestemming." }
+        },
+        { "id": "CONCL_CW2_Ja_Anonimiserenof toestemmingvragen", "type": "conclusion", "text": "Anonimiseren of toestemming vragen", "metadata": {} },
+        {
+          "id": "C-W3",
+          "type": "question",
+          "text": "Bevat het document informatie die internationale betrekkingen kan schaden?",
+          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW3_Ja_Nietopenbaar" }, { "text": "Nee", "nextNodeId": "C-W4" } ],
+          "metadata": { "waarom": "Schade aan internationale relaties is een geldige weigeringsgrond.", "citaat": "“Informatie mag geheim blijven als publicatie de relatie met andere landen of internationale organisaties schaadt.”", "artikelOfRichtlijn": "Woo art. 5.1 lid 2 sub a", "toelichting": "Informatie die internationale betrekkingen schaadt, hoeft niet openbaar te worden gemaakt." }
+        },
+        { "id": "CONCL_CW3_Ja_Nietopenbaar", "type": "conclusion", "text": "Niet openbaar", "metadata": {} },
+        {
+          "id": "C-W4",
+          "type": "question",
+          "text": "Bevat het document persoonlijke beleidsopvattingen van ambtenaren of bestuurders?",
+          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW4_Ja_Anonimiseren" }, { "text": "Nee", "nextNodeId": "C-W5" } ],
+          "metadata": { "waarom": "Beleidsoverwegingen zijn intern en hoeven niet openbaar tenzij anoniem.", "citaat": "\"“Meningen en adviezen van ambtenaren hoeven niet openbaar te worden, behalve als ze anoniem zijn en het beleid ondersteunen.”\"", "artikelOfRichtlijn": "Woo art. 5.2", "toelichting": "Interne beleidsopvattingen mogen alleen openbaar worden gemaakt als ze niet tot een persoon zijn te herleiden." }
+        },
+        { "id": "CONCL_CW4_Ja_Anonimiseren", "type": "conclusion", "text": "Anonimiseren", "metadata": {} },
+        {
+          "id": "C-W5",
+          "type": "question",
+          "text": "Gaat het om milieu-informatie, zoals over uitstoot of vervuiling?",
+          "answers": [ { "text": "Ja", "nextNodeId": "C-W6" }, { "text": "Nee", "nextNodeId": "C-W7" } ],
+          "metadata": { "waarom": "Voor milieu-informatie gelden strengere eisen voor geheimhouding.", "citaat": "“Bij milieu-informatie zijn de regels strenger: die moet vaker wél openbaar worden.”", "artikelOfRichtlijn": "Woo art. 5.1 lid 5", "toelichting": "Milieu-informatie mag alleen worden geweigerd als openbaarmaking echt ernstige schade zou doen." }
+        },
+        {
+          "id": "C-W6",
+          "type": "question",
+          "text": "Is de milieu-informatie bedrijfsgevoelig en zou openbaarmaking ernstige schade doen?",
+          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW6_Ja_Nietopenbaar" }, { "text": "Nee", "nextNodeId": "C-W7" } ],
+          "metadata": { "waarom": "Alleen bij ernstige schade mag milieu-info geheim blijven.", "citaat": "“Milieu-informatie mag alleen geheim blijven als het delen ervan ernstige schade aan bedrijven veroorzaakt.”", "artikelOfRichtlijn": "Woo art. 5.1 lid 5", "toelichting": "Milieu-informatie mag alleen worden geweigerd als openbaarmaking echt ernstige schade zou doen." }
+        },
+        { "id": "CONCL_CW6_Ja_Nietopenbaar", "type": "conclusion", "text": "Niet openbaar", "metadata": {} },
+        {
+          "id": "C-W7",
+          "type": "question",
+          "text": "Zou openbaarmaking onevenredige schade toebrengen aan andere belangen?",
+          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW7_Ja_Nietopenbaar" }, { "text": "Nee", "nextNodeId": "C-W8" } ],
+          "metadata": { "waarom": "Er is een afweging nodig tussen belang van openbaarheid en schade.", "citaat": "“Informatie mag geheim blijven als openbaarheid te veel schade doet aan belangen die zwaarder wegen dan transparantie.”", "artikelOfRichtlijn": "Woo art. 5.1 lid 3", "toelichting": "Openbaarmaking mag achterwege blijven bij onevenredige schade aan andere belangen." }
+        },
+        { "id": "CONCL_CW7_Ja_Nietopenbaar", "type": "conclusion", "text": "Niet openbaar", "metadata": {} },
+        {
+          "id": "C-W8",
+          "type": "question",
+          "text": "Heeft een private partij toestemming gegeven voor publicatie van gevoelige informatie?",
+          "answers": [ { "text": "Ja", "nextNodeId": "CONCL_CW8_Ja_ResultaatDocumentopenbaar" }, { "text": "Nee", "nextNodeId": "CONCL_CW8_Nee_Toestemmingvragenofanonimiseren" } ],
+          "metadata": { "waarom": "Zonder toestemming mag gevoelige info niet worden gedeeld.", "citaat": "“Voor gevoelige informatie van bedrijven of andere partijen is toestemming vereist voor publicatie.”", "artikelOfRichtlijn": "Richtlijn publicatie", "toelichting": "Bij gevoelige informatie van derden is toestemming vereist voor publicatie." }
+        },
+        { "id": "CONCL_CW8_Ja_ResultaatDocumentopenbaar", "type": "conclusion", "text": "Document openbaar", "metadata": { "tag": "Document openbaar"} }, // Tag toegevoegd voor consistentie
+        { "id": "CONCL_CW8_Nee_Toestemmingvragenofanonimiseren", "type": "conclusion", "text": "Toestemming vragen of anonimiseren", "metadata": {} }
+      ]
+    }
+  ];
+
+  // Globale variabelen voor de wizard-status
+  let currentFlowName = null;
+  let currentFlowData = null;
+  let currentNodeId = null;
+  let userAnswersHistory = []; 
+
+  // DOM Elementen
+  const wizardContainer = document.getElementById('wizardContainer');
+  const mainHeader = document.querySelector('header h1');
+  const mainParagraph = document.querySelector('header p');
+  const docId = new URLSearchParams(location.search).get('id');
+
+  function initializeWizard() {
+    startFlow("Publicatiecontrole");
+  }
+
+  function startFlow(flowName) {
+    currentFlowName = flowName;
+    currentFlowData = decisionTreesData[0]; 
+
+    if (!currentFlowData || currentFlowData.flowName !== flowName) {
+      showModal('Fout', `De beslisboom "${flowName}" kon niet correct worden geladen.`);
+      wizardContainer.innerHTML = `<p>Fout bij laden van beslisboom: ${flowName}</p>`;
+      return;
+    }
+
+    currentNodeId = currentFlowData.startNodeId;
+    userAnswersHistory = []; 
+    if(mainHeader) mainHeader.textContent = `Wizard – ${currentFlowName}`;
+    if(mainParagraph) mainParagraph.textContent = 'Beantwoord de onderstaande vragen om tot een conclusie te komen.';
+    renderNode(currentNodeId);
+  }
+
+  function renderNode(nodeId) {
+    const node = currentFlowData.nodes.find(n => n.id === nodeId);
+    wizardContainer.innerHTML = ''; 
+
+    if (!node) {
+      showModal('Fout', `Ongeldige stap (ID: ${nodeId}) in de beslisboom "${currentFlowName}". Neem contact op met de beheerder.`);
+      const errorMsg = createDOMElement('p', `Fout: Interne stap '${nodeId}' niet gevonden.`);
+      const homeButton = createDOMElement('button', 'Terug naar overzicht', 'btn-neutral');
+      homeButton.addEventListener('click', () => { window.location.href = 'index.html'; });
+      wizardContainer.append(errorMsg, homeButton);
+      return;
+    }
+
+    if (node.type === 'question') {
+      renderQuestionNode(node);
+    } else if (node.type === 'conclusion') {
+      renderConclusionNode(node);
+    }
+  }
+
+  function renderQuestionNode(node) {
+    const questionElement = createDOMElement('p', node.text, 'wizard-question');
+    wizardContainer.appendChild(questionElement);
+
+    if (node.metadata && Object.keys(node.metadata).length > 0) {
+      const metadataElement = createDOMElement('div', null, 'metadata-info');
+      let html = '';
+      if(node.metadata.toelichting) html += `<p><strong>Toelichting:</strong> ${node.metadata.toelichting}</p>`;
+      if(node.metadata.waarom) html += `<p><strong>Waarom deze vraag:</strong> ${node.metadata.waarom}</p>`;
+      if(node.metadata.citaat) html += `<p><strong>Relevant citaat:</strong> <em>${node.metadata.citaat}</em></p>`;
+      if(node.metadata.artikelOfRichtlijn) html += `<p><strong>Zie ook:</strong> ${node.metadata.artikelOfRichtlijn}</p>`;
+      metadataElement.innerHTML = html;
+      wizardContainer.appendChild(metadataElement);
+    }
+
+    const buttonWrapper = createDOMElement('div', null, 'wizard-buttons');
+    node.answers.forEach(answer => {
+      let btnClass = 'btn-neutral';
+      if (answer.text.toLowerCase() === 'ja') btnClass = 'btn-yes';
+      else if (answer.text.toLowerCase() === 'nee') btnClass = 'btn-no';
+      
+      const buttonElement = createDOMElement('button', answer.text, btnClass);
+      buttonElement.addEventListener('click', () => processAnswer(node.id, answer.text, answer.nextNodeId));
+      buttonWrapper.appendChild(buttonElement);
+    });
+    wizardContainer.appendChild(buttonWrapper);
+    
+    const backToOverviewButton = createDOMElement('button', 'Terug naar overzicht', 'btn-neutral');
+    backToOverviewButton.style.marginTop = '1rem'; 
+    backToOverviewButton.style.backgroundColor = '#6c757d'; 
+    backToOverviewButton.addEventListener('click', () => { window.location.href = 'index.html'; });
+    wizardContainer.appendChild(backToOverviewButton);
+  }
+
+  function processAnswer(fromNodeId, answerText, nextNodeId) {
+    const fromNode = currentFlowData.nodes.find(n => n.id === fromNodeId);
+    userAnswersHistory.push({ question: fromNode.text, answer: answerText });
+    currentNodeId = nextNodeId;
+    renderNode(currentNodeId);
+  }
+
+  function renderConclusionNode(node) {
+    const conclusionSection = createDOMElement('div', null, 'conclusion-section');
+    const titleElement = createDOMElement('h2', 'Conclusie');
+    conclusionSection.appendChild(titleElement);
+
+    const textElement = createDOMElement('p', node.text, 'conclusion-text');
+    conclusionSection.appendChild(textElement);
+
+    if (node.metadata && Object.keys(node.metadata).length > 0) {
+      const metadataElement = createDOMElement('div', null, 'metadata-info');
+      let html = '';
+      if(node.metadata.tag) html += `<p><strong>Voorgestelde Tag:</strong> ${node.metadata.tag}</p>`;
+      if(node.metadata.toelichting) html += `<p><strong>Toelichting bij conclusie:</strong> ${node.metadata.toelichting}</p>`;
+      if(node.metadata.waarom) html += `<p><strong>Reden voor conclusie:</strong> ${node.metadata.waarom}</p>`;
+      if(node.metadata.citaat) html += `<p><strong>Relevant citaat:</strong> <em>${node.metadata.citaat}</em></p>`;
+      if(node.metadata.artikelOfRichtlijn) html += `<p><strong>Zie ook:</strong> ${node.metadata.artikelOfRichtlijn}</p>`;
+      metadataElement.innerHTML = html;
+      conclusionSection.appendChild(metadataElement);
+    }
+    wizardContainer.appendChild(conclusionSection);
+
+    if (userAnswersHistory.length > 0) {
+      const summaryElement = createDOMElement('div', null, 'summary');
+      let summaryHTML = '<strong>Uw antwoordenpad:</strong><ul>';
+      userAnswersHistory.forEach(item => {
+        const icon = item.answer.toLowerCase() === 'ja' ? '✔️' : (item.answer.toLowerCase() === 'nee' ? '❌' : '➡️');
+        summaryHTML += `<li>${icon} ${item.question} &rarr; <strong>${item.answer}</strong></li>`;
+      });
+      summaryHTML += '</ul>';
+      summaryElement.innerHTML = summaryHTML;
+      wizardContainer.appendChild(summaryElement);
+    }
+
+    const buttonWrapper = createDOMElement('div', null, 'wizard-buttons');
+    buttonWrapper.style.marginTop = '1.5rem';
+
+    // Knop voor categorie toewijzen (indien relevant)
+    // Voor Publicatiecontrole kan de tag "Document openbaar" zijn, of andere conclusies die geen directe tag hebben.
+    const assignableTags = ["Document openbaar"]; 
+    if (docId && node.metadata && node.metadata.tag && assignableTags.includes(node.metadata.tag)) {
+      const assignButton = createDOMElement('button', `Status "${node.metadata.tag}" toewijzen`, 'btn-yes');
+      assignButton.addEventListener('click', async () => {
+        try {
+          await assignCategoryAPI(docId, node.metadata.tag); // Gebruik de tag als categorie
+          showModal('Succes!', `Status "${node.metadata.tag}" is succesvol toegewezen aan document ${docId}.`);
+        } catch (error) {
+          showModal('Fout bij toewijzen', `Er is een fout opgetreden: ${error.message}.`);
+        }
+      });
+      buttonWrapper.appendChild(assignButton);
+    }
+    
+    const restartCurrentFlowButton = createDOMElement('button', 'Start deze beslisboom opnieuw', 'btn-neutral');
+    restartCurrentFlowButton.addEventListener('click', () => startFlow(currentFlowName));
+    buttonWrapper.appendChild(restartCurrentFlowButton);
+
+    const backToOverviewButton = createDOMElement('button', 'Terug naar overzicht', 'btn-neutral');
+    backToOverviewButton.style.backgroundColor = '#6c757d';
+    backToOverviewButton.addEventListener('click', () => { window.location.href = 'index.html'; });
+    buttonWrapper.appendChild(backToOverviewButton);
+    
+    wizardContainer.appendChild(buttonWrapper);
+  }
+
+  function createDOMElement(tag, textContent, className) {
+    const el = document.createElement(tag);
+    if (textContent) el.textContent = textContent;
+    if (className) el.className = className;
+    return el;
+  }
+
+  async function assignCategoryAPI(documentId, category) {
+    console.log(`API Call: Document ${documentId}, Categorie/Status ${category}`);
+    return new Promise(resolve => setTimeout(() => {
+        console.log(`Simulated API success for ${documentId} with category/status ${category}`);
+        resolve({ success: true, message: "Categorie/Status toegewezen." });
+    }, 1000));
+  }
+
+  function showModal(title, message) {
+    let modalOverlay = document.getElementById('customModalOverlay');
+    if (modalOverlay) modalOverlay.remove(); 
+
+    modalOverlay = createDOMElement('div', null, 'modal-overlay');
+    modalOverlay.id = 'customModalOverlay';
+
+    const modalContent = createDOMElement('div', null, 'modal-content');
+    const modalTitle = createDOMElement('h3', title);
+    const modalMessage = createDOMElement('p', message);
+    const closeButton = createDOMElement('button', 'Sluiten', 'btn-neutral');
+
+    closeButton.onclick = () => {
+      modalOverlay.classList.remove('active');
+      setTimeout(() => modalOverlay.remove(), 300);
+    };
+    
+    modalContent.append(modalTitle, modalMessage, closeButton);
+    modalOverlay.appendChild(modalContent);
+    document.body.appendChild(modalOverlay);
+
+    void modalOverlay.offsetWidth;
+    modalOverlay.classList.add('active');
+  }
+
+  document.addEventListener('DOMContentLoaded', initializeWizard);
+</script>
+</body>
+</html>

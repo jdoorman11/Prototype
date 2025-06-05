@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wizard – Bepaal categorie Adviescollege</title>
+  <style>
+    /* --- mobielvriendelijke basisopmaak --- */
+    :root {
+      --color-success: #0d8a43;
+      --color-error: #c62828;
+      --color-warning: #ed6c02;
+      --color-info: #005da9;
+      --color-text: #333;
+      --color-text-light: #666;
+      --color-bg: #f8f9fa;
+      --color-white: #fff;
+      --border-radius: 8px;
+      --transition: all 0.2s ease-in-out;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--color-bg);
+      margin: 0;
+      padding: 0 1rem;
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+    
+    header, footer {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 1.5rem 0;
+      text-align: center;
+    }
+    
+    header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--color-text);
+    }
+    
+    header p {
+      margin: 0.25rem 0 1rem;
+      font-size: 1rem;
+      color: var(--color-text-light);
+    }
+    
+    .wizard {
+      max-width: 720px;
+      margin: 0 auto 2rem;
+      background: var(--color-white);
+      border: 1px solid #e1e4e8;
+      border-radius: var(--border-radius);
+      padding: 2rem 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .wizard-question {
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin: 0 0 1.5rem;
+      color: var(--color-text);
+    }
+    
+    .wizard-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    
+    .wizard-buttons button {
+      flex: 1 1 120px;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: var(--border-radius);
+      color: var(--color-white);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+    
+    .wizard-buttons button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .wizard-buttons button:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .wizard-buttons button:active {
+      transform: translateY(0);
+    }
+    
+    .btn-yes { background: var(--color-success); }
+    .btn-no { background: var(--color-error); }
+    .btn-neutral { background: var(--color-info); }
+    
+    .summary {
+      background: #eef2f6;
+      padding: 1.25rem;
+      border-radius: var(--border-radius);
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    
+    .summary strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+      color: var(--color-text);
+    }
+    
+    /* Notificaties */
+    .notification {
+      padding: 1rem 1.25rem;
+      margin: 0 0 1.5rem 0;
+      border-radius: var(--border-radius);
+      position: relative;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .notification.success {
+      background-color: #e8f5e9;
+      border-left: 4px solid var(--color-success);
+      color: #1b5e20;
+    }
+    
+    .notification.error {
+      background-color: #ffebee;
+      border-left: 4px solid var(--color-error);
+      color: #c62828;
+    }
+    
+    .notification.warning {
+      background-color: #fff8e1;
+      border-left: 4px solid var(--color-warning);
+      color: #e65100;
+    }
+    
+    .notification.info {
+      background-color: #e3f2fd;
+      border-left: 4px solid var(--color-info);
+      color: #0d47a1;
+    }
+    
+    .notification p {
+      margin: 0.5rem 0 0;
+    }
+    
+    .notification small {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.85em;
+      opacity: 0.8;
+    }
+    
+    /* Animaties */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Responsieve aanpassingen */
+    @media (max-width: 600px) {
+      .wizard {
+        padding: 1.5rem 1rem;
+      }
+      
+      .wizard-buttons {
+        flex-direction: column;
+      }
+      
+      .wizard-buttons button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header component wordt hier geladen -->
+  <header data-component="header"></header>
+
+  <main class="wizard" id="wizard" aria-live="polite"></main>
+
+  <footer>
+    Prototype wizard • Mei 2025
+  </footer>
+
+<script>
+  // Configuratie
+  const CONFIG = {
+    // Gebruik de volledige URL in productie, anders relatief pad
+    API_BASE_URL: window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api'
+  };
+  
+  // Debug informatie
+  console.log('Configuratie:', CONFIG);
+  console.log('Huidige locatie:', window.location.href);
+
+  /* ============================================================
+     Beslisboom voor Adviescolleges
+     ============================================================ */
+  const FLOW = {
+    start: "A-1",
+    nodes: {
+      "A-1": {
+        question: "Is het document afkomstig van een adviescollege?",
+        yes: "A-2",
+        no: "GEEN_ADVIESCOLLEGE"
+      },
+      "A-2": {
+        question: "Is het een officieel adviesrapport van het college?",
+        yes: "A-3",
+        no: "A-4"
+      },
+      "A-3": {
+        question: "Is het advies bestemd voor een overheidsinstantie?",
+        yes: "ADVIESCOLLEGE_RAPPORT",
+        no: "TWEEVRAAG"
+      },
+      "A-4": {
+        question: "Gaat het om interne notities of concepten?",
+        yes: "ADVIESCOLLEGE_INTERN",
+        no: "TWEEVRAAG"
+      }
+    },
+    results: {
+      "ADVIESCOLLEGE_RAPPORT": "Dit is een officieel adviesrapport van een adviescollege.",
+      "ADVIESCOLLEGE_INTERN": "Dit zijn interne notities of concepten van een adviescollege.",
+      "GEEN_ADVIESCOLLEGE": "Dit document lijkt geen betrekking te hebben op een adviescollege.",
+      "TWEEVRAAG": "Neem contact op met de afdeling voor een nadere beoordeling."
+    }
+  };
+
+  /* ============================================================
+     Wizard-logica – Vanilla JS
+     ============================================================ */
+  (function() {
+    const wizard = document.getElementById('wizard');
+    const answers = [];
+    let current = FLOW.start;
+    const docId = new URLSearchParams(location.search).get('id');
+
+    function render(id) {
+      const node = FLOW.nodes[id];
+      wizard.innerHTML = '';
+
+      if (!node) {
+        wizard.innerHTML = '<p>Onbekende stap: ' + id + '</p>';
+        return;
+      }
+
+      const q = create('p', node.question, 'wizard-question');
+      wizard.append(q);
+
+      const btnWrap = create('div', null, 'wizard-buttons');
+      btnWrap.append(
+        button('Ja', 'btn-yes', () => nextStep(id, 'yes')),
+        button('Nee', 'btn-no', () => nextStep(id, 'no'))
+      );
+      wizard.append(btnWrap);
+    }
+
+    function nextStep(fromId, key) {
+      const node = FLOW.nodes[fromId];
+      const target = node[key];
+      answers.push((key === 'yes' ? '✔️ ' : '❌ ') + node.question);
+
+      if (FLOW.results[target]) {
+        renderResult(target);
+      } else {
+        current = target;
+        render(current);
+      }
+    }
+
+    function renderResult(key) {
+      wizard.innerHTML = '';
+      const h2 = create('h2', 'Resultaat');
+      const p = create('p'); p.innerHTML = FLOW.results[key];
+      wizard.append(h2, p);
+
+      if (answers.length) {
+        const summary = create('div', null, 'summary');
+        summary.innerHTML = '<strong>Jouw antwoorden:</strong><br>' + answers.join('<br>');
+        wizard.append(summary);
+      }
+
+      const btnWrap = create('div', null, 'wizard-buttons');
+      
+      // Toon toewijsknop als het een adviescollege betreft
+      if ((key === 'ADVIESCOLLEGE_RAPPORT' || key === 'ADVIESCOLLEGE_INTERN') && docId) {
+        btnWrap.append(button('Categorie "Adviescollege" toewijzen', 'btn-yes', async () => {
+          const button = this.event?.target;
+          const originalText = button?.textContent;
+          
+          try {
+            // Disable de knop en toon laadstatus
+            if (button) {
+              button.disabled = true;
+              button.textContent = 'Bezig met opslaan...';
+            }
+            
+            await assignCategory(docId, 'Adviescollege');
+            
+            // Succesmelding tonen en doorverwijzen
+            const successMsg = create('div', null, 'notification success');
+            successMsg.textContent = 'Categorie "Adviescollege" is succesvol toegewezen! Doorverwijzen...';
+            wizard.prepend(successMsg);
+            
+            // Na 1,5 seconden doorverwijzen
+            setTimeout(() => {
+              location.href = 'index.html';
+            }, 1500);
+            
+          } catch (error) {
+            console.error('Fout bij toewijzen categorie:', error);
+            
+            // Toon foutmelding boven aan de wizard
+            const errorDiv = create('div', null, 'notification error');
+            errorDiv.innerHTML = `
+              <strong>Fout bij opslaan:</strong>
+              <p>${error.message.split('\n')[0]}</p>
+              <small>Bekijk de browser console voor meer details (F12 > Console)</small>
+            `;
+            
+            // Voeg een knop toe om de fout te rapporteren
+            const reportButton = document.createElement('button');
+            reportButton.className = 'btn-neutral';
+            reportButton.textContent = 'Fout melden';
+            reportButton.addEventListener('click', () => {
+              const subject = 'Foutmelding categorie toewijzen';
+              const body = `Foutmelding: ${error.message}\n\nStack trace:\n${error.stack || 'Geen stack trace beschikbaar'}`;
+              window.open(`mailto:support@jouwdomein.nl?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+            });
+            
+            errorDiv.appendChild(reportButton);
+            wizard.prepend(errorDiv);
+            
+            // Scroll naar de foutmelding
+            errorDiv.scrollIntoView({ behavior: 'smooth' });
+            
+          } finally {
+            // Herstel de knop
+            if (button) {
+              button.disabled = false;
+              if (originalText) button.textContent = originalText;
+            }
+          }
+        }));
+      }
+      
+      btnWrap.append(
+        button('Opnieuw starten', 'btn-neutral', () => { answers.length = 0; current = FLOW.start; render(current); }),
+        button('Terug naar overzicht', 'btn-no', () => location.href = 'index.html')
+      );
+      wizard.append(btnWrap);
+    }
+
+    async function assignCategory(id, category) {
+      const requestUrl = `${CONFIG.API_BASE_URL}/documents/${id}`;
+      
+      try {
+        // Eerst het document ophalen om bestaande gegevens te behouden
+        const getResponse = await fetch(requestUrl);
+        if (!getResponse.ok) {
+          throw new Error(`Kon document niet ophalen: ${getResponse.status} ${getResponse.statusText}`);
+        }
+        
+        const documentData = await getResponse.json();
+        
+        // Bestaande gegevens behouden en alleen de categorie updaten
+        const updateData = {
+          ...documentData,
+          categorie: category
+        };
+        
+        const requestOptions = {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updateData),
+          credentials: 'same-origin'
+        };
+
+        console.log('API-aanvraag:', {
+          url: requestUrl,
+          options: requestOptions
+        });
+
+        const response = await fetch(requestUrl, requestOptions);
+        const responseData = await response.text();
+        
+        console.log('API-antwoord:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          body: responseData
+        });
+
+        if (!response.ok) {
+          let errorMessage = `HTTP-fout: ${response.status} ${response.statusText}`;
+          try {
+            const errorData = JSON.parse(responseData);
+            errorMessage += ` - ${errorData.message || JSON.stringify(errorData)}`;
+          } catch (e) {
+            errorMessage += ` - ${responseData}`;
+          }
+          throw new Error(errorMessage);
+        }
+
+        // Succesvolle respons verwerken
+        try {
+          const result = responseData ? JSON.parse(responseData) : {};
+          console.log('Categorie succesvol toegewezen:', result);
+          return result;
+        } catch (e) {
+          console.warn('Kon API-antwoord niet parsen als JSON:', e);
+          return { success: true };
+        }
+
+      } catch (error) {
+        console.error('Fout bij het toewijzen van categorie:', {
+          error: error.toString(),
+          stack: error.stack,
+          request: { url: requestUrl, options: requestOptions }
+        });
+        
+        let userMessage = 'Er is een fout opgetreden bij het toewijzen van de categorie.';
+        
+        // Specifieke foutmeldingen voor veelvoorkomende problemen
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+          userMessage = 'Kon geen verbinding maken met de server. Controleer uw internetverbinding.';
+        } else if (error.message.includes('401') || error.message.includes('403')) {
+          userMessage = 'U heeft geen rechten om deze actie uit te voeren. Log opnieuw in.';
+        } else if (error.message.includes('404')) {
+          userMessage = 'Document niet gevonden. Het document is mogelijk verwijderd of verplaatst.';
+        } else if (error.message.includes('500')) {
+          userMessage = 'Er is een serverfout opgetreden. Probeer het later opnieuw.';
+        }
+        
+        throw new Error(`${userMessage}\n\nTechnische details: ${error.message}`);
+      }
+    }
+
+    function button(text, cls, onclick) {
+      const b = create('button', text, cls);
+      b.type = 'button';
+      b.addEventListener('click', onclick);
+      return b;
+    }
+
+    function create(tag, text, cls) {
+      const el = document.createElement(tag);
+      if (text) el.textContent = text;
+      if (cls) el.className = cls;
+      return el;
+    }
+
+    // Start de wizard
+    render(current);
+  })();
+</script>
+<script src="/js/load-components.js"></script>
+</body>
+</html>

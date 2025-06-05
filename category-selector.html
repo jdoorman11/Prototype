@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Categorie Selectie – Gemeente Arnhem</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .category-card {
+      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      background: white;
+    }
+    .category-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .category-card a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      height: 100%;
+    }
+    .category-card h3 {
+      margin: 0 0 0.5rem;
+      color: #005da9;
+    }
+    .category-card p {
+      margin: 0;
+      color: #555;
+      font-size: 0.9rem;
+    }
+    .coming-soon {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .page-header {
+      max-width: 800px;
+      margin: 0 auto 2rem;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #005da9;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header component will be loaded here -->
+  <header data-component="header"></header>
+
+  <main class="container">
+    <div class="page-header">
+      <p>Kies hieronder bij welk type document het beste past. Elk type heeft een eigen wizard om u te helpen de juiste categorie te bepalen.</p>
+    </div>
+
+    <div class="category-grid">
+      <!-- Convenanten - Active -->
+      <div class="category-card">
+        <a id="convenant-link" href="#">
+          <h3>Convenanten</h3>
+          <p>Schriftelijke afspraken tussen de gemeente en externe partijen</p>
+        </a>
+      </div>
+
+      <!-- Coming soon categories -->
+      <div class="category-card coming-soon">
+        <div>
+          <h3>Wet- en regelgeving</h3>
+          <p>Besluiten, verordeningen en regels</p>
+          <small>Binnenkort beschikbaar</small>
+        </div>
+      </div>
+
+      <div class="category-card coming-soon">
+        <div>
+          <h3>Organisatiegegevens</h3>
+          <p>Informatie over de gemeentelijke organisatie</p>
+          <small>Binnenkort beschikbaar</small>
+        </div>
+      </div>
+
+      <div class="category-card">
+        <a id="adviescollege-link" href="wizard-adviescollege.html">
+          <h3>Stukken van adviescolleges</h3>
+          <p>Adviezen en rapporten van adviesorganen</p>
+        </a>
+      </div>
+
+      <div class="category-card coming-soon">
+        <div>
+          <h3>Bestuursstukken</h3>
+          <p>Besluiten en beleidsstukken van het bestuur</p>
+          <small>Binnenkort beschikbaar</small>
+        </div>
+      </div>
+
+      <div class="category-card coming-soon">
+        <div>
+          <h3>Raadsstukken</h3>
+          <p>Documenten van en voor de gemeenteraad</p>
+          <small>Binnenkort beschikbaar</small>
+        </div>
+      </div>
+
+      <div class="category-card coming-soon">
+        <div>
+          <h3>Klachten</h3>
+          <p>Ingediende klachten en afhandelingen</p>
+          <small>Binnenkort beschikbaar</small>
+        </div>
+      </div>
+
+      <div class="category-card coming-soon">
+        <div>
+          <h3>Beschikkingen</h3>
+          <p>Formele besluiten over individuele gevallen</p>
+          <small>Binnenkort beschikbaar</small>
+        </div>
+      </div>
+
+      <div class="category-card coming-soon">
+        <div>
+          <h3>Onderzoeksrapporten</h3>
+          <p>Onderzoeksresultaten en analyses</p>
+          <small>Binnenkort beschikbaar</small>
+        </div>
+      </div>
+
+      <div class="category-card coming-soon">
+        <div>
+          <h3>Wob/Woo-verzoeken</h3>
+          <p>Verzoeken om informatie en openbaarmaking</p>
+          <small>Binnenkort beschikbaar</small>
+        </div>
+      </div>
+
+
+      <div class="category-card coming-soon">
+        <div>
+          <h3>Jaarplannen en -verslagen</h3>
+          <p>Jaarlijkse overzichten en evaluaties</p>
+          <small>Binnenkort beschikbaar</small>
+        </div>
+      </div>
+    </div>
+
+    <a href="javascript:history.back()" class="back-link">← Terug naar overzicht</a>
+  </main>
+
+  <footer class="site-footer">
+    Prototype categorie-selectie • Gemeente Arnhem • ${new Date().getFullYear()}
+  </footer>
+
+  <script>
+    // Get document ID from URL and check if coming from wizard
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get('id');
+    const fromWizard = urlParams.get('fromWizard') === 'true';
+    
+    // Check if we have a stored result for this document
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set up the convenant and adviescollege links
+      const convenantLink = document.getElementById('convenant-link');
+      const adviescollegeLink = document.getElementById('adviescollege-link');
+      
+      if (docId) {
+        if (convenantLink) {
+          convenantLink.href = `wizard.html?id=${docId}`;
+        }
+        if (adviescollegeLink) {
+          adviescollegeLink.href = `wizard-adviescollege.html?id=${docId}`;
+        }
+        
+        const convenantChecked = sessionStorage.getItem(`checked_convenant_${docId}`);
+        if (convenantChecked === 'false') {
+          // Add cross mark to Convenanten category
+          const convenantCard = document.querySelector('.category-card:first-child');
+          if (convenantCard) {
+            const crossMark = document.createElement('span');
+            crossMark.textContent = ' ❌';
+            crossMark.style.marginLeft = '8px';
+            crossMark.style.color = '#c62828';
+            const title = convenantCard.querySelector('h3');
+            if (title) title.appendChild(crossMark);
+            
+            // Add a tooltip
+            const tooltip = document.createElement('div');
+            tooltip.textContent = 'Uit de wizard is gebleken dat dit waarschijnlijk geen convenant is.';
+            tooltip.style.fontSize = '0.85rem';
+            tooltip.style.color = '#666';
+            tooltip.style.marginTop = '0.5rem';
+            const cardContent = convenantCard.querySelector('a, div');
+            if (cardContent) cardContent.appendChild(tooltip);
+          }
+        }
+      }
+    });
+  </script>
+  <script src="/js/load-components.js"></script>
+</body>
+</html>

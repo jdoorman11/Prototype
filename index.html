@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype Woo‑publicaties – Gemeente Arnhem</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <script src="/js/categories.js"></script>
+  <script>
+    // ----------------------
+    //  Client‑side filtering
+    // ----------------------
+    function initFilters(container) {
+      const searchInput  = document.querySelector('#search-input');
+      const categorySel  = document.querySelector('#category-select');
+      const statusSel    = document.querySelector('#status-select');
+      const rows         = container.querySelectorAll('tbody tr');
+
+      function filter() {
+        const term = searchInput.value.toLowerCase();
+        const cat  = categorySel.value;
+        const stat = statusSel.value;
+
+        rows.forEach(row => {
+          const title   = row.dataset.title;
+          const rowCat  = row.dataset.category;
+          const rowStat = row.dataset.status;
+          const show = (!term || title.includes(term)) && (!cat || cat === rowCat) && (!stat || stat === rowStat);
+          row.style.display = show ? '' : 'none';
+        });
+      }
+
+      searchInput.addEventListener('input',  filter);
+      categorySel.addEventListener('change', filter);
+      statusSel.addEventListener('change',  filter);
+    }
+  </script>
+  <script src="/js/load-components.js"></script>
+</head>
+<body>
+  <!-- Header component will be loaded here -->
+  <header data-component="header"></header>
+
+
+  <main>
+    <!-- Zoek & filter controls -->
+    <section class="search-filter">
+      <form onsubmit="return false;" aria-label="Zoek en filter publicaties">
+        <label class="visually-hidden" for="search-input">Zoekterm</label>
+        <input type="search" id="search-input" placeholder="Zoek op titel …" />
+
+        <label class="visually-hidden" for="category-select">Categorie</label>
+        <select id="category-select">
+          <option value="">Alle categorieën</option>
+          <option value="Convenant">Convenanten</option>
+          <option value="Adviesstuk">Adviesstukken</option>
+        </select>
+
+        <label class="visually-hidden" for="status-select">Status</label>
+        <select id="status-select">
+          <option value="">Alle statussen</option>
+          <option value="Gepubliceerd">Gepubliceerd</option>
+          <option value="In bewerking">In bewerking</option>
+        </select>
+      </form>
+    </section>
+
+    <!-- ======================
+         Dynamische publicaties
+         ====================== -->
+    <section aria-labelledby="dynamic-heading">
+      <h2 id="dynamic-heading" class="visually-hidden">Publicaties uit database</h2>
+
+      <table class="results-table dynamic-table">
+        <thead>
+          <tr>
+            <th>Titel</th><th>Categorie</th><th>Publicatiedatum</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Wordt via JS gevuld -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="site-footer">Prototype v0.4 • Dynamische koppeling • mei 2025</footer>
+
+  <script>
+    // ------------------------
+    //  Dynamische data laden
+    // ------------------------
+    async function loadDynamic() {
+      // Use relative URL to avoid CORS issues
+      const url = '/api/documents';
+      const tbody = document.querySelector('.dynamic-table tbody');
+      
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
+        const items = await resp.json();
+        
+        tbody.innerHTML = '';
+        
+        if (items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4">Geen documenten gevonden.</td></tr>';
+          return;
+        }
+        
+        items.forEach(doc => {
+          // Skip addendums as they'll be shown under their parent
+          if (doc.parent_id) return;
+          
+          // Create main document row
+          const tr = document.createElement('tr');
+          tr.className = 'document-row';
+          tr.dataset.id = doc.id;
+          tr.dataset.title = doc.titel.toLowerCase();
+          tr.dataset.category = doc.categorie || 'Onbekend';
+          tr.dataset.status = doc.status || 'Onbekend';
+          
+          // Format category
+          const catHtml = doc.categorie 
+            ? doc.categorie 
+            : `<button class="btn-unknown" onclick="window.location.href='category-selector.html?id=${doc.id}'">Onbekend</button>`;
+          
+          // Format status with centralized status display
+          const statusElement = document.createElement('span');
+          statusElement.className = 'status';
+          updateStatusElement(statusElement, doc.status);
+          
+          // Make status clickable
+          const statusLink = document.createElement('a');
+          statusLink.href = doc.status === 'in_afwachting' || doc.status === 'concept'
+            ? `publicatie-stappen.html?id=${doc.id}`
+            : `detail-document.html?id=${doc.id}`;
+          statusLink.appendChild(statusElement);
+          
+          const statusHtml = statusLink.outerHTML;
+          
+          // Format date
+          const formattedDate = doc.publicatiedatum 
+            ? new Date(doc.publicatiedatum).toLocaleDateString('nl-NL') 
+            : '';
+          
+          // Create title cell with addendum toggle if needed
+          const hasAddendums = doc.addendums && doc.addendums.length > 0;
+          const titleCell = document.createElement('td');
+          const titleContainer = document.createElement('div');
+          titleContainer.className = 'document-title';
+          
+          // Add toggle button for addendums
+          if (hasAddendums) {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'addendum-toggle';
+            toggleBtn.innerHTML = '▶';
+            toggleBtn.title = 'Toon bijlagen';
+            toggleBtn.onclick = (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const wasCollapsed = toggleBtn.classList.toggle('collapsed');
+              toggleBtn.innerHTML = wasCollapsed ? '▼' : '▶';
+              
+              // Toggle addendum rows
+              const addendumRows = document.querySelectorAll(`tr.addendum-row[data-parent-id="${doc.id}"]`);
+              addendumRows.forEach(row => {
+                row.style.display = wasCollapsed ? 'table-row' : 'none';
+              });
+            };
+            titleContainer.appendChild(toggleBtn);
+          } else {
+            // Add empty space for alignment
+            const spacer = document.createElement('span');
+            spacer.className = 'addendum-spacer';
+            spacer.innerHTML = '&nbsp;&nbsp;';
+            titleContainer.appendChild(spacer);
+          }
+          
+          // Add document title
+          const titleLink = document.createElement('a');
+          titleLink.className = 'doc-link';
+          titleLink.href = `detail-convenant.html?id=${doc.id}`;
+          titleLink.textContent = doc.titel || 'Naamloos document';
+          titleContainer.appendChild(titleLink);
+          titleCell.appendChild(titleContainer);
+          
+          // Add all cells to the row
+          tr.innerHTML = '';
+          tr.appendChild(titleCell);
+          tr.insertAdjacentHTML('beforeend', `
+            <td>${catHtml}</td>
+            <td>${formattedDate}</td>
+            <td>${statusHtml}</td>
+          `);
+          
+          tbody.appendChild(tr);
+          
+          // Add addendum rows if they exist
+          if (hasAddendums) {
+            doc.addendums.forEach(addendum => {
+              const addendumTr = document.createElement('tr');
+              addendumTr.className = 'addendum-row';
+              addendumTr.dataset.id = addendum.id;
+              addendumTr.dataset.parentId = doc.id;
+              addendumTr.style.display = 'none'; // Start hidden
+              
+              // Format addendum status with centralized status display
+              const addendumStatusElement = document.createElement('span');
+              addendumStatusElement.className = 'status';
+              updateStatusElement(addendumStatusElement, addendum.status);
+              
+              // Make status clickable
+              const addendumStatusLink = document.createElement('a');
+              addendumStatusLink.href = addendum.status === 'in_afwachting' || addendum.status === 'concept'
+                ? `publicatie-stappen.html?id=${addendum.id}`
+                : `detail-document.html?id=${addendum.id}`;
+              addendumStatusLink.appendChild(addendumStatusElement);
+              
+              const addendumStatus = addendumStatusLink.outerHTML;
+              
+              // Format addendum date
+              const addendumDate = addendum.publicatiedatum 
+                ? new Date(addendum.publicatiedatum).toLocaleDateString('nl-NL')
+                : '';
+              
+              addendumTr.innerHTML = `
+                <td class="addendum-cell">
+                  <div class="document-title">
+                    <span class="addendum-indicator">↳</span>
+                    <a href="detail-convenant.html?id=${addendum.id}" class="doc-link">
+                      ${addendum.titel || 'Naamloos addendum'}
+                    </a>
+                  </div>
+                </td>
+                <td>${doc.categorie || 'Convenant'}</td>
+                <td>${addendumDate}</td>
+                <td>${addendumStatus}</td>
+              `;
+              
+              tbody.appendChild(addendumTr);
+            });
+          }
+        });
+        
+        // Initialize filters after loading data
+        initFilters(document);
+        
+      } catch (error) {
+        console.error('Fout bij laden dynamische data:', error);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4">
+              Fout bij het ophalen van de gegevens. Probeer het later opnieuw.
+              <button onclick="loadDynamic()" class="btn-retry">Opnieuw proberen</button>
+            </td>
+          </tr>`;
+      }
+    }
+
+    // Load data when the page loads
+    document.addEventListener('DOMContentLoaded', loadDynamic);
+  </script>
+  
+  <style>
+    .btn-retry {
+      margin-top: 8px;
+      padding: 4px 12px;
+      background-color: #0052cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-retry:hover {
+      background-color: #003d99;
+    }
+
+    /* Addendum dropdown styles */
+    .document-title {
+      display: flex;
+      align-items: center;
+    }
+    
+    .addendum-toggle {
+      background: none;
+      border: none;
+      color: #0052cc;
+      cursor: pointer;
+      padding: 0 8px;
+      margin-left: 8px;
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+    
+    .addendum-toggle:hover {
+      color: #003d99;
+    }
+    
+    .addendum-toggle.collapsed {
+      transform: rotate(-90deg);
+    }
+    
+    .addendum-list {
+      display: none;
+      margin: 8px 0 0 20px;
+      padding: 0;
+      list-style: none;
+    }
+    
+    .addendum-list.visible {
+      display: block;
+    }
+    
+    .addendum-item {
+      display: block;
+      padding: 4px 0;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    
+    .addendum-item:before {
+      content: '→ ';
+      color: #666;
+    }
+    
+    .addendum-item:hover {
+      text-decoration: underline;
+      color: #0052cc;
+    }
+  </style>
+</body>
+</html>

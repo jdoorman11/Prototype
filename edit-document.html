@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bewerk Document</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/css/categories.css">
+  <style>
+    .edit-form {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .document-title {
+      padding: 0.5rem;
+      background: #f8f9fa;
+      border-radius: 4px;
+      border: 1px solid #e9ecef;
+    }
+    .btn-primary {
+      background: #005da9;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-left: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header component will be loaded here -->
+  <header data-component="header"></header>
+
+  <main>
+    <div class="edit-form">
+      <h2>Bewerk Document</h2>
+      
+      <form id="editForm">
+        <div class="form-group">
+          <label class="form-label">Titel</label>
+          <div class="document-title">
+            <span id="title"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Categorie</label>
+          <div id="categoryOptions" class="category-options">
+            <!-- Categorieën worden hier ingeladen via JavaScript -->
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Publicatiestatus</label>
+          <div id="statusOptions" class="status-options">
+            <!-- Statusopties worden hier ingeladen via JavaScript -->
+          </div>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="btn-primary">Opslaan</button>
+          <button type="button" class="btn-secondary" onclick="window.location.href='detail-document.html'">Annuleren</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Wrap in an immediately invoked async function
+    (async function() {
+      // Add a small delay to ensure DOM is fully loaded
+      await new Promise(resolve => window.addEventListener('DOMContentLoaded', resolve));
+      console.log('DOM fully loaded');
+      // Get document ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const docId = urlParams.get('id');
+
+      if (!docId) {
+        alert('Document ID niet gevonden');
+        window.location.href = 'index.html';
+        return;
+      }
+
+    // Load document details
+    console.log('Attempting to load document with ID:', docId);
+    try {
+      const response = await fetch(`/api/documents/${docId}`);
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Document niet gevonden (${response.status} ${response.statusText})`);
+      }
+      
+      const doc = await response.json();
+      console.log('Loaded document:', doc);
+      
+      // Check if document has required fields
+      if (!doc.titel && !doc.document_name) {
+        throw new Error('Ongeldig document formaat: titel ontbreekt');
+      }
+      
+      const titleElement = document.getElementById('title');
+      if (!titleElement) {
+        throw new Error('Titel element niet gevonden in het formulier');
+      }
+      
+      // Use document_name if titel is not available (fallback for different API responses)
+      titleElement.textContent = doc.titel || doc.document_name;
+      
+      // Set the correct category
+      const categoryValue = doc.categorie || '';
+      console.log('Setting category to:', categoryValue);
+      
+      // Reset all category radios first
+      document.querySelectorAll('input[name="category"]').forEach(radio => {
+        radio.checked = false;
+      });
+      
+      // Try to find and check the matching category radio
+      const categoryInputs = document.getElementsByName('category');
+      let foundCategory = false;
+      
+      for (const input of categoryInputs) {
+        if (input.value === categoryValue) {
+          input.checked = true;
+          foundCategory = true;
+          break;
+        }
+      }
+      
+      // If no matching category found, check the 'Onbekend' option
+      if (!foundCategory) {
+        console.warn('Category not found in options, defaulting to empty');
+        const unknownInput = document.querySelector('input[name="category"][value=""]');
+        if (unknownInput) {
+          unknownInput.checked = true;
+        }
+      }
+
+      // Set the publication status using the centralized status functions
+      const publicationStatus = doc.status || 'concept';
+      console.log('Setting publication status to:', publicationStatus);
+      
+      // Render the status options with the current status
+      renderStatusOptions('statusOptions', publicationStatus);
+      
+      // Map old status values to new ones for backward compatibility
+      const statusMappings = {
+        'In bewerking': 'concept',
+        'In afwachting': 'in_afwachting',
+        'Gepubliceerd': 'gepubliceerd',
+        'Archief': 'gearchiveerd'
+      };
+      
+      // If the status is an old value, update it to the new format
+      if (statusMappings[publicationStatus]) {
+        const newStatus = statusMappings[publicationStatus];
+        console.log(`Mapping status from '${publicationStatus}' to '${newStatus}'`);
+        renderStatusOptions('statusOptions', newStatus);
+      }
+      
+    } catch (error) {
+      // Log het volledige error object
+      console.error('Fout bij het laden van het document:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+        fullError: error
+      });
+      
+      // Toon fout in de console en in de pagina
+      const errorDiv = document.createElement('div');
+      errorDiv.style.color = 'red';
+      errorDiv.style.padding = '1rem';
+      errorDiv.style.margin = '1rem 0';
+      errorDiv.style.border = '1px solid #ff4444';
+      errorDiv.style.borderRadius = '4px';
+      errorDiv.style.backgroundColor = '#ffeeee';
+      
+      // Maak de foutmelding duidelijker
+      const errorMessage = error.message || 'Onbekende fout';
+      const errorName = error.name || 'Error';
+      
+      errorDiv.innerHTML = `
+        <h3>Fout bij het laden van het document</h3>
+        <p><strong>${errorName}:</strong> ${errorMessage}</p>
+        <p>Controleer de console voor meer details (druk op F12 en ga naar het Console tabblad).</p>
+      `;
+      
+      // Voeg de foutmelding toe aan het begin van de pagina
+      const main = document.querySelector('main');
+      if (main) {
+        main.insertBefore(errorDiv, main.firstChild);
+      } else {
+        document.body.insertBefore(errorDiv, document.body.firstChild);
+      }
+      
+      // Gooi de fout opnieuw zodat deze ook in de console verschijnt
+      throw error;
+    }
+
+    // Handle form submission
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const selectedRadio = document.querySelector('input[name="category"]:checked');
+      if (!selectedRadio) {
+        alert('Selecteer een categorie');
+        return;
+      }
+      
+      const selectedStatus = document.querySelector('input[name="publicationStatus"]:checked');
+      if (!selectedStatus) {
+        alert('Selecteer een publicatiestatus');
+        return;
+      }
+      
+      const selectedCategory = selectedRadio.value;
+      console.log('Selected category:', selectedCategory);
+      console.log('Document ID:', docId);
+
+      try {
+        // Get the current title from the document
+        const titleElement = document.getElementById('title');
+        const currentTitle = titleElement ? titleElement.textContent.trim() : '';
+        
+        const response = await fetch(`/api/documents/${docId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            titel: currentTitle,
+            categorie: selectedRadio.value,
+            status: selectedStatus.value
+          })
+        });
+
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
+          let errorMessage = 'Kon document niet bijwerken';
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.error || errorMessage;
+          } catch (e) {
+            errorMessage = errorText || errorMessage;
+          }
+          throw new Error(errorMessage);
+        }
+
+        // If we get here, the update was successful
+        const updatedDoc = await response.json();
+        console.log('Update successful:', updatedDoc);
+        
+        // Show success message before redirecting
+        alert('Categorie succesvol bijgewerkt!');
+        // Redirect to the document details page
+        window.location.href = `detail-document.html?id=${docId}`;
+        
+      } catch (error) {
+        console.error('Error updating document:', error);
+        alert('Fout bij bijwerken: ' + error.message);
+      }
+    });
+    })(); // End of immediately invoked function
+  </script>
+  <script src="/js/load-components.js"></script>
+  <script src="/js/categories.js"></script>
+  <script>
+    // Configuratie
+    const CONFIG = {
+      API_BASE_URL: window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api'
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const docId = urlParams.get('id');
+
+      if (!docId) {
+        alert('Document ID niet gevonden');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      try {
+        // Laad documentgegevens
+        const response = await fetch(`${CONFIG.API_BASE_URL}/documents/${docId}`);
+        if (!response.ok) throw new Error('Document niet gevonden');
+        
+        const doc = await response.json();
+        document.getElementById('title').textContent = doc.titel || doc.document_name;
+        
+        // Laad categorieën en status
+        renderCategoryOptions('categoryOptions', doc.categorie || '');
+        renderStatusOptions('statusOptions', doc.status || 'concept');
+
+        // Formulier verzenden
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          try {
+            // Eerst het huidige document ophalen
+            const response = await fetch(`${CONFIG.API_BASE_URL}/documents/${docId}`);
+            if (!response.ok) throw new Error('Kon document niet ophalen');
+            
+            const currentDoc = await response.json();
+            
+            // Formuliergegevens samenstellen
+            const updatedDoc = {
+              ...currentDoc, // Behoud bestaande velden
+              categorie: getSelectedValue('category'),
+              status: getSelectedValue('status'),
+              titel: document.getElementById('documentTitle')?.value || currentDoc.titel,
+              content: document.getElementById('documentContent')?.value || currentDoc.content
+            };
+            
+            console.log('Updating document with data:', updatedDoc);
+            
+            // Document bijwerken
+            const updateResponse = await fetch(`${CONFIG.API_BASE_URL}/documents/${docId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(updatedDoc)
+            });
+
+            if (!updateResponse.ok) {
+              const errorData = await updateResponse.json().catch(() => ({}));
+              console.error('Update error response:', errorData);
+              throw new Error(`Opslaan mislukt: ${updateResponse.status} ${updateResponse.statusText}`);
+            }
+
+            // Toon succesbericht
+            alert('Document succesvol opgeslagen!');
+            // Terug naar de hoofdpagina
+            window.location.href = 'index.html';
+          } catch (error) {
+            console.error('Fout bij opslaan:', error);
+            alert(`Er is een fout opgetreden: ${error.message}`);
+          }
+        });
+
+      } catch (error) {
+        console.error('Fout bij laden document:', error);
+        alert('Er is een fout opgetreden bij het laden van het document');
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>

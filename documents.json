@@ -1,0 +1,95 @@
+{
+  "documents": [
+    {
+      "id": 1,
+      "titel": "Overeenkomst duurzaamheid",
+      "categorie": null,
+      "publicatiedatum": "2025-01-15",
+      "status": "Gepubliceerd"
+    },
+    {
+      "id": 2,
+      "titel": "Beleidsnota mobiliteit",
+      "categorie": "Convenant",
+      "publicatiedatum": "2025-05-22",
+      "status": "Gepubliceerd"
+    },
+    {
+      "id": 3,
+      "titel": "Samenwerkingsovereenkomst onderwijs",
+      "categorie": "Convenant",
+      "publicatiedatum": "2025-05-22",
+      "status": "Gepubliceerd"
+    },
+    {
+      "id": 4,
+      "titel": "Adviesrapport woningvoorraad",
+      "categorie": "Convenant",
+      "publicatiedatum": "2025-04-15",
+      "status": "Gepubliceerd"
+    },
+    {
+      "id": 5,
+      "titel": "Onderzoeksrapport verkeersveiligheid",
+      "categorie": "Adviescollege",
+      "publicatiedatum": "2025-05-05",
+      "status": "Gepubliceerd"
+    },
+    {
+      "id": 6,
+      "titel": "Vergaderingsnotulen raadplegingscollege",
+      "categorie": "Overige",
+      "publicatiedatum": "2025-04-22",
+      "status": "Gepubliceerd"
+    },
+    {
+      "id": 7,
+      "titel": "Jaarverslag 2024",
+      "categorie": "Adviesstuk",
+      "publicatiedatum": "2025-01-31",
+      "status": "Gepubliceerd"
+    },
+    {
+      "id": 8,
+      "titel": "Onderzoeksrapport groenstructuur",
+      "categorie": "Adviescollege",
+      "publicatiedatum": "2025-03-28",
+      "status": "Gepubliceerd"
+    },
+    {
+      "id": 9,
+      "titel": "Beleidsplan woningbouw",
+      "categorie": "Convenant",
+      "publicatiedatum": null,
+      "status": "In bewerking"
+    },
+    {
+      "id": 10,
+      "titel": "Onderzoeksrapport milieu",
+      "categorie": "Adviesstuk",
+      "publicatiedatum": null,
+      "status": "In bewerking"
+    },
+    {
+      "id": 11,
+      "titel": "Beleidsnota verkeer",
+      "categorie": "Convenant",
+      "publicatiedatum": "2025-05-22",
+      "status": "Gepubliceerd"
+    },
+    {
+      "id": 12,
+      "titel": "Onderzoeksrapport sport",
+      "categorie": "Adviesstuk",
+      "publicatiedatum": "2025-04-30",
+      "status": "Gepubliceerd"
+    },
+    {
+      "id": 13,
+      "titel": "Jaarverslag 2023",
+      "categorie": "Convenant",
+      "publicatiedatum": "2024-01-31",
+      "status": "Gepubliceerd"
+    }
+  ]
+}

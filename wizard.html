@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wizard – Bepaal categorie Convenant</title>
+  <style>
+    /* --- mobielvriendelijke basisopmaak --- */
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f8f9fa;margin:0;padding:0 1rem}
+    header,footer{max-width:720px;margin:0 auto;padding:1.5rem 0;text-align:center}
+    header h1{margin:0;font-size:1.5rem}
+    header p{margin:.25rem 0 1rem;font-size:1rem;color:#555}
+    .wizard{max-width:720px;margin:0 auto;background:#fff;border:1px solid #e1e4e8;border-radius:8px;padding:2rem 1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+    .wizard-question{font-weight:600;font-size:1.125rem;margin:0 0 1.5rem}
+    .wizard-buttons{display:flex;gap:1rem;flex-wrap:wrap}
+    .wizard-buttons button{flex:1 1 120px;padding:.625rem 1rem;font-size:1rem;border:none;border-radius:4px;color:#fff;font-weight:600;cursor:pointer;transition:opacity .15s}
+    .wizard-buttons button:hover{opacity:.9}
+    .btn-yes{background:#0d8a43}
+    .btn-no{background:#c62828}
+    .btn-neutral{background:#005da9}
+    .summary{background:#eef2f6;padding:1rem;border-radius:6px;margin-top:1.5rem;font-size:.95rem;line-height:1.4}
+    .summary strong{display:block;margin-bottom:.25rem}
+  </style>
+</head>
+<body>
+  <!-- Header component will be loaded here -->
+  <header data-component="header"></header>
+
+  <main class="wizard" id="wizard" aria-live="polite"></main>
+
+  <footer>
+    Prototype wizard • Mei 2025
+  </footer>
+
+<script>
+  /* ============================================================
+     Beslisboom uit Excel – géén handmatige aanpassing nodig
+     ============================================================ */
+  const FLOW = {"start":"C-1","nodes":{"C-1":{"question":"Bevat het document schriftelijke afspraken tussen de gemeente Arnhem en ten minste één externe partij?","yes":"C-2","no":"C-A"},"C-2":{"question":"Is het doel van de afspraken het voorbereiden of uitvoeren van beleid of een overheidstaak?","yes":"C-3","no":"GEEN_CONVENANT"},"C-3":{"question":"Is het document géén (werk)instructie of puur interbestuurlijke afspraak (zoals een gegevensuitwisseling tussen bestuursorganen)?","yes":"C-4","no":"GEEN_CONVENANT"},"C-4":{"question":"Gaat het om een overeenkomst die burgers onderling óók kunnen sluiten (bijv. koop- of huurovereenkomst)?","yes":"GEEN_CONVENANT","no":"C-5"},"C-5":{"question":"Is het document een handhavingsovereenkomst of een andere afspraak over een individuele overtreding of casus?","yes":"GEEN_CONVENANT","no":"C-6"},"C-6":{"question":"Is dit de definitieve, door alle partijen ondertekende versie?","yes":"CONVENANT_VASTGESTELD","no":"C-A"},"C-A":{"question":"Is het document een aanvulling / addendum (toetreding, uittreding of verlenging) op een bestaand convenant?","yes":"CONVENANT_ADDENDUM","no":"GEEN_CONVENANT"}},"results":{"CONVENANT_VASTGESTELD":"Dit is een definitief, door alle partijen ondertekend convenant.","CONVENANT_ADDENDUM":"Dit is een addendum op een bestaand convenant.","GEEN_CONVENANT":"Het document is géén convenant."}};
+  /* ============================================================
+     Wizard-logica – Vanilla JS
+     ============================================================ */
+  (function() {
+    const wizard = document.getElementById('wizard');
+    const answers = [];
+    let current = FLOW.start;
+    const docId = new URLSearchParams(location.search).get('id');
+
+    function render(id) {
+      const node = FLOW.nodes[id];
+      wizard.innerHTML = '';
+
+      if (!node) {
+        wizard.innerHTML = '<p>Onbekende stap: ' + id + '</p>';
+        return;
+      }
+
+      const q = create('p', node.question, 'wizard-question');
+      wizard.append(q);
+
+      const btnWrap = create('div', null, 'wizard-buttons');
+      btnWrap.append(
+        button('Ja', 'btn-yes', () => nextStep(id, 'yes')),
+        button('Nee', 'btn-no', () => nextStep(id, 'no'))
+      );
+      wizard.append(btnWrap);
+    }
+
+    function nextStep(fromId, key) {
+      const node = FLOW.nodes[fromId];
+      const target = node[key];
+      answers.push((key === 'yes' ? '✔️ ' : '❌ ') + node.question);
+
+      if (FLOW.results[target]) {
+        renderResult(target);
+      } else {
+        current = target;
+        render(current);
+      }
+    }
+
+    function renderResult(key) {
+      // If the result is GEEN_CONVENANT and we have a docId, redirect back to category selector
+      if (key === 'GEEN_CONVENANT' && docId) {
+        // Store in session that convenant was checked and is not a match
+        sessionStorage.setItem(`checked_convenant_${docId}`, 'false');
+        // Redirect back to category selector with the document ID
+        window.location.href = `category-selector.html?id=${docId}&fromWizard=true`;
+        return;
+      }
+
+      wizard.innerHTML = '';
+      const h2 = create('h2', 'Resultaat');
+      const p = create('p'); p.innerHTML = FLOW.results[key];
+      wizard.append(h2, p);
+
+      if (answers.length) {
+        const summary = create('div', null, 'summary');
+        summary.innerHTML = '<strong>Jouw antwoorden:</strong><br>' + answers.join('<br>');
+        wizard.append(summary);
+      }
+
+      const btnWrap = create('div', null, 'wizard-buttons');
+      if (docId) {
+        if (key === 'CONVENANT_VASTGESTELD') {
+          // Store in session that convenant was checked and is a match
+          sessionStorage.setItem(`checked_convenant_${docId}`, 'true');
+          btnWrap.append(button('Categorie "Convenant" toewijzen', 'btn-yes', () => assignCategory(docId, 'Convenant')));
+        } else if (key === 'CONVENANT_ADDENDUM') {
+          // Show addendum assignment UI
+          sessionStorage.setItem(`checked_convenant_${docId}`, 'addendum');
+          showAddendumAssignment(docId, btnWrap);
+        }
+      }
+      btnWrap.append(
+        button('Opnieuw starten', 'btn-neutral', () => { answers.length = 0; current = FLOW.start; render(current); }),
+        button('Terug naar overzicht', 'btn-no', () => location.href = 'index.html')
+      );
+      wizard.append(btnWrap);
+    }
+
+    async function assignCategory(id, category) {
+      try {
+        console.log('Updating document', id, 'with category:', category);
+        
+        // First, get the current document to preserve its title
+        const docResponse = await fetch(`/api/documents/${id}`);
+        if (!docResponse.ok) {
+          throw new Error('Kon document niet ophalen voor update');
+        }
+        const document = await docResponse.json();
+        
+        // Use the existing title or a default if not available
+        const title = document.titel || document.document_name || 'Document zonder titel';
+        
+        const resp = await fetch('/api/documents/' + id, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            titel: title, // Use the existing title
+            categorie: category 
+          })
+        });
+        
+        console.log('Response status:', resp.status);
+        
+        if (!resp.ok) {
+          const errorText = await resp.text();
+          console.error('Error response:', errorText);
+          throw new Error(`HTTP ${resp.status}: ${errorText || 'Unknown error'}`);
+        }
+        
+        const result = await resp.json();
+        console.log('Update successful:', result);
+        
+        alert('Categorie succesvol toegewezen!');
+        window.location.href = `detail-document.html?id=${id}`;
+      } catch (err) {
+        console.error('Error in assignCategory:', err);
+        alert('Opslaan mislukt: ' + (err.message || 'Onbekende fout'));
+      }
+    }
+    
+    async function showAddendumAssignment(docId, container) {
+      try {
+        // Show loading state
+        const loadingDiv = create('div', 'Bezig met laden van convenanten...');
+        container.appendChild(loadingDiv);
+        
+        // Fetch all convenants (documents with category 'Convenant')
+        const response = await fetch('/api/documents');
+        if (!response.ok) throw new Error('Kon convenanten niet ophalen');
+        
+        const documents = await response.json();
+        const convenants = documents.filter(doc => 
+          doc.categorie === 'Convenant' && !doc.parent_id
+        );
+        
+        if (convenants.length === 0) {
+          loadingDiv.textContent = 'Geen convenanten gevonden om aan te koppelen.';
+          return;
+        }
+        
+        // Create dropdown with convenants
+        container.removeChild(loadingDiv);
+        
+        const selectLabel = create('label', 'Selecteer parent/bijbehorend convenant:');
+        selectLabel.style.display = 'block';
+        selectLabel.style.margin = '1rem 0 0.5rem';
+        container.appendChild(selectLabel);
+        
+        const select = create('select');
+        select.style.width = '100%';
+        select.style.padding = '0.5rem';
+        select.style.marginBottom = '1rem';
+        select.style.borderRadius = '4px';
+        select.style.border = '1px solid #ccc';
+        
+        // Add empty option
+        const emptyOption = create('option', 'Selecteer een convenant...');
+        emptyOption.value = '';
+        emptyOption.disabled = true;
+        emptyOption.selected = true;
+        select.appendChild(emptyOption);
+        
+        // Add convenant options
+        convenants.forEach(convenant => {
+          const option = create('option', convenant.titel);
+          option.value = convenant.id;
+          select.appendChild(option);
+        });
+        
+        container.appendChild(select);
+        
+        // Add assign button
+        const assignButton = button('Koppel als addendum', 'btn-yes', async () => {
+          const convenantId = select.value;
+          if (!convenantId) {
+            alert('Selecteer een convenant');
+            return;
+          }
+          
+          // Show loading state
+          const originalButtonText = assignButton.textContent;
+          assignButton.textContent = 'Bezig met koppelen...';
+          assignButton.disabled = true;
+          
+          try {
+            console.log('Attempting to link document', docId, 'as addendum to', convenantId);
+            // First get the current document to preserve its data
+            const docResponse = await fetch(`/api/documents/${docId}`);
+            if (!docResponse.ok) {
+              throw new Error('Kon document niet ophalen: ' + await docResponse.text());
+            }
+            const currentDoc = await docResponse.json();
+            
+            console.log('Current document data:', currentDoc);
+            
+            // Update the document with parent_id
+            console.log('Sending update with parent_id:', convenantId);
+            
+            try {
+              const updateResponse = await fetch(`/api/documents/${docId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                  titel: currentDoc.titel || currentDoc.document_name || 'Document zonder titel',
+                  parent_id: convenantId,
+                  categorie: currentDoc.categorie || currentDoc.tag || 'Convenant'
+                })
+              });
+              
+              console.log('Update response status:', updateResponse.status);
+              
+              if (!updateResponse.ok) {
+                const errorText = await updateResponse.text();
+                console.error('Update error:', errorText);
+                throw new Error(errorText || 'Kon addendum niet koppelen');
+              }
+              
+              const result = await updateResponse.json();
+              console.log('Update successful:', result);
+              
+              alert('Addendum succesvol gekoppeld aan het geselecteerde convenant!');
+              window.location.href = `detail-document.html?id=${docId}`;
+              
+            } catch (updateError) {
+              console.error('Error during update:', updateError);
+              throw updateError;
+            }
+          } catch (err) {
+            alert('Fout bij koppelen addendum: ' + err.message);
+          }
+        });
+        
+        assignButton.style.marginTop = '1rem';
+        container.appendChild(assignButton);
+        
+      } catch (err) {
+        console.error('Error loading convenants:', err);
+        alert('Fout bij het ophalen van de convenanten: ' + err.message);
+      }
+    }
+
+    function button(text, cls, onclick) {
+      const b = create('button', text, cls);
+      b.type = 'button';
+      b.addEventListener('click', onclick);
+      return b;
+    }
+
+    function create(tag, text, cls) {
+      const el = document.createElement(tag);
+      if (text) el.textContent = text;
+      if (cls) el.className = cls;
+      return el;
+    }
+
+    // Start de wizard
+    render(current);
+  })();
+</script>
+<script src="/js/load-components.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+/* Stijlen voor optiegroepen */
+.category-options,
+.status-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.category-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: normal;
+  margin: 0;
+}
+
+.category-options label:hover {
+  background: #e9ecef;
+  border-color: #ced4da;
+}
+
+.category-options input[type="radio"] {
+  margin: 0;
+  width: 1.1em;
+  height: 1.1em;
+  cursor: pointer;
+}
+
+/* Focus stijlen voor toegankelijkheid */
+.category-options label:focus-within {
+  outline: 2px solid #005da9;
+  outline-offset: 2px;
+}
+
+/* Geselecteerde categorie */
+.category-options input[type="radio"]:checked + span {
+  font-weight: 600;
+  color: #005da9;
+}
+
+/* Status-specifieke stijlen */
+.status-options label {
+  position: relative;
+  padding-left: 2.5rem;
+}
+
+.status-options input[type="radio"] {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Status weergave stijlen */
+.status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Kleuren voor verschillende statussen */
+.status.concept {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.status.in-afwachting {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status.gepubliceerd {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status.gearchiveerd {
+  background-color: #e2d4f0;
+  color: #4a1e8a;
+}
+
+/* Kleuren voor formulier selecties */
+.status-options input[value="concept"]:checked + span {
+  color: #495057;
+}
+
+.status-options input[value="in_afwachting"]:checked + span {
+  color: #856404;
+}
+
+.status-options input[value="gepubliceerd"]:checked + span {
+  color: #155724;
+}
+
+.status-options input[value="gearchiveerd"]:checked + span {
+  color: #4a1e8a;
+}
+
+/* Responsieve aanpassingen */
+@media (max-width: 600px) {
+  .category-options {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .category-options label {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+}

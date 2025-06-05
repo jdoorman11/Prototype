@@ -1,0 +1,473 @@
+:root {
+  /* Officiële Arnhem kleuren */
+  --color-primary: #005da9;        /* Midden-blauw uit logo */
+  --color-primary-dark: #002b5c;   /* Diep marine-blauw */
+  --color-accent: #e87722;         /* Oranje accent */
+  --color-accent-dark: #c7681d;
+  --color-success: #0d8a43;        /* Groen */
+  --color-warning: #ff7300;        /* Oranje waarschuwing */
+  --color-danger: #d9534f;         /* Rood fout */
+  --color-bg: #ffffff;             /* Witte achtergrond */
+  --color-surface: #ffffff;        /* Witte oppervlakken */
+  --color-border: #dadfe4;         /* Lichte rand */
+  --color-text: #222222;           /* Donkere tekst */
+
+  /* Typografie & spacing */
+  --font-base: 'RO Sans', 'Noto Sans', Arial, sans-serif;
+  --font-size-base: 16px;
+  --space-xs: .25rem;
+  --space-sm: .5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+
+  /* Afrondingen */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+}
+
+/* ===== Reset & basis ===== */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 100%; line-height: 1.5; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-base);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ===== Site‑header ===== */
+.site-header {
+  background: var(--color-bg);
+  padding: var(--space-lg) var(--space-md);
+  border-bottom: 4px solid var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.site-header-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.site-header-logo img {
+  height: 40px;
+  width: auto;
+}
+
+.site-header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.site-header-subtitle {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* ===== Navigatie ===== */
+.site-header a {
+  color: var(--color-primary-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+.site-header a:hover,
+.site-header a:focus { color: var(--color-primary); }
+
+/* ===== Zoek‑ / filterbalk ===== */
+.search-filter {
+  background: #e7edf3;
+  padding: var(--space-md);
+}
+.search-filter form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+.search-filter input[type="search"],
+.search-filter select {
+  flex: 1 1 180px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid #c4c9d2;
+  border-radius: var(--radius-sm);
+}
+.search-filter button {
+  padding: var(--space-sm) 1.5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  cursor: pointer;
+  transition: background-color .2s ease, box-shadow .2s ease;
+}
+.search-filter button:hover,
+.search-filter button:focus {
+  background: var(--color-accent-dark);
+  box-shadow: 0 2px 4px rgba(0,0,0,.15);
+}
+
+/* ===== Document Rows & Addendums ===== */
+.document-row {
+  background-color: #fff;
+}
+
+.addendum-row {
+  background-color: #f8fafc;
+}
+
+.addendum-row .addendum-cell {
+  padding-left: 2.5rem !important;
+  position: relative;
+}
+
+.addendum-indicator {
+  color: #6b7280;
+  margin-right: 0.5rem;
+  display: inline-block;
+  width: 1.5rem;
+  text-align: center;
+}
+
+.addendum-toggle {
+  background: none;
+  border: none;
+  color: #4b5563;
+  cursor: pointer;
+  font-size: 0.8em;
+  padding: 0 0.25rem;
+  margin-right: 0.25rem;
+  vertical-align: middle;
+  transition: transform 0.2s ease;
+}
+
+.addendum-toggle.collapsed {
+  transform: rotate(90deg);
+}
+
+.addendum-spacer {
+  display: inline-block;
+  width: 1.5rem;
+}
+
+.doc-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.doc-link:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+/* ===== Resultatentabel ===== */
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-md) auto var(--space-xl);
+  max-width: 960px;
+}
+.results-table th,
+.results-table td {
+  padding: var(--space-sm) var(--space-xs);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+/* Document title link styling */
+.results-table td a.doc-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-block;
+  padding: 0.25rem 0;
+  margin-right: 5px;
+}
+
+.results-table td a.doc-link:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  background: linear-gradient(transparent 80%, rgba(0, 0, 0, 0.1) 80%);
+}
+
+/* Add a subtle hover effect to the entire row */
+.results-table tr:hover {
+  background-color: var(--color-surface);
+  transition: background-color 0.2s ease;
+}
+.results-table th {
+  background: #f0f2f5;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+/* ===== Buttons & badges ===== */
+/*   Basis knop   */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .65rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-sm);  /* Zelfde radius als zoek‑knop */
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color .2s ease, box-shadow .2s ease;
+}
+.button-primary { background: var(--color-accent); color: #fff; }
+.button-primary:hover,
+.button-primary:focus { background: var(--color-accent-dark); box-shadow: 0 2px 4px rgba(0,0,0,.15); }
+.button-secondary { background: #e7edf3; color: var(--color-primary-dark); }
+.button-secondary:hover,
+.button-secondary:focus { background: #d3dbe2; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+
+/*   Status‑ en actie‑knoppen   */
+.status,
+.btn-publish,
+.btn-action,
+.btn-unknown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s ease;
+  text-decoration: none;
+  border: 2px solid transparent;
+  min-width: 120px;
+  text-align: center;
+}
+
+.btn-unknown {
+  background: var(--color-danger);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-unknown::after {
+  content: 'Beoordeel...';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-unknown:hover::after,
+.btn-unknown:focus::after {
+  opacity: 1;
+}
+
+.btn-unknown:active {
+  transform: translateY(0);
+  background: #b83b38;
+}
+
+.btn-unknown:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.2);
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color .2s ease;
+}
+
+.back-button:hover {
+  color: var(--color-primary-dark);
+}
+
+.status.published   { background: var(--color-success); color: #fff; }
+.status.draft,
+.btn-publish         { background: var(--color-warning); color: #fff; }
+.btn-publish.published {
+  background: #155724;
+  color: white;
+}
+.btn-publish.in-bewerking {
+  background: #856404;
+  color: white;
+}
+.btn-publish.published:hover {
+  background: #104a1e;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.btn-publish.in-bewerking:hover {
+  background: #6d4a03;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+.status.null-link,
+.btn-unknown         { background: var(--color-danger); color: #fff; cursor: pointer; }
+.status.null-link:hover,
+.btn-unknown:hover   { background: #c23c37; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+
+/* ===== Detail page ===== */
+.preview-container {
+  max-width: 960px;
+  margin: var(--space-xl) auto;
+  padding: 0 var(--space-md);
+}
+.meta-list { display: grid; grid-template-columns: 120px 1fr; gap: var(--space-xs) var(--space-md); margin: 0 0 var(--space-lg); font-size: .95rem; }
+.meta-list dt { font-weight: 600; color: #444; }
+.meta-list dd { margin: 0; }
+
+/* ===== Wizard ===== */
+.wizard {
+  max-width: 720px;
+  margin: var(--space-xl) auto;
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 6px rgba(0,0,0,.05);
+}
+.wizard-step { margin-bottom: var(--space-lg); font-size: 1.1rem; line-height: 1.4; }
+.wizard-step strong { display: block; font-weight: 600; margin-bottom: var(--space-xs); }
+.wizard-buttons { display: flex; gap: var(--space-sm); margin-bottom: var(--space-lg); }
+.btn-primary,
+.btn-secondary { flex: 1 1 120px; text-align: center; }
+.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary:hover { background: #00437d; }
+.btn-secondary { background: #e7edf3; color: var(--color-primary-dark); }
+.btn-secondary:hover { background: #d3dbe2; }
+.progress { height: 6px; background: #e7edf3; border-radius: 3px; overflow: hidden; margin: var(--space-md) 0; }
+.progress-bar { width: 0; height: 100%; background: var(--color-primary); transition: width .3s ease; }
+.result-card { padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border); margin-bottom: 1rem; display: flex; align-items: center; gap: var(--space-sm); }
+.result-card svg { flex: 0 0 32px; height: 32px; width: 32px; }
+.result-card.convenant  { background: #edf8f1; border-color: #cce8d5; }
+.result-card.adviesstuk { background: #e9f2ff; border-color: #c8d9f7; }
+.result-card.overige    { background: #f5f5f5; border-color: #e0e0e0; }
+
+/* ===== Footer ===== */
+.site-footer { text-align: center; padding: var(--space-md) 0 var(--space-xl); font-size: .9rem; background: #f0f2f5; color: #555; }
+
+/* ===== Visually hidden ===== */
+.visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px,1px,1px,1px); white-space: nowrap; }
+
+/* ===== Responsive ===== */
+@media (max-width: 640px) {
+  .results-table thead { display: none; }
+  .results-table tr { display: block; margin-bottom: 1rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm); overflow: hidden; }
+  .results-table td { display: flex; justify-content: space-between; padding: .65rem .75rem; border: none; }
+  .results-table td::before { content: attr(data-label); font-weight: 600; margin-right: var(--space-sm); }
+  .back-link { position: static; margin-bottom: var(--space-lg); }
+  .wizard { margin: var(--space-md); }
+  .wizard-buttons { flex-direction: column; }
+  .btn-primary,
+  .btn-secondary { flex: 1 1 auto; }
+}
+
+/* Addendum dropdown stijlen */
+.document-with-addendums {
+  position: relative;
+  display: inline-block;
+}
+
+.addendum-dropdown {
+  display: inline-block;
+  margin-left: 10px;
+  position: relative;
+}
+
+.addendum-toggle {
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.8em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.addendum-toggle:hover {
+  background: #e0e0e0;
+}
+
+.addendum-count {
+  color: #666;
+}
+
+.dropdown-arrow {
+  font-size: 0.7em;
+  transition: transform 0.2s;
+}
+
+.addendum-dropdown:hover .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.addendum-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  min-width: 200px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  z-index: 1000;
+  top: 100%;
+  left: 0;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.addendum-menu.show {
+  display: block;
+}
+
+.addendum-item {
+  display: block;
+  padding: 8px 12px;
+  color: #333;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid #eee;
+}
+
+.addendum-item:last-child {
+  border-bottom: none;
+}
+
+.addendum-item:hover {
+  background-color: #f5f5f5;
+}
