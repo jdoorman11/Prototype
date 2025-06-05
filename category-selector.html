@@ -184,7 +184,7 @@
         if (adviescollegeLink) {
           adviescollegeLink.href = `wizard-adviescollege.html?id=${docId}`;
         }
-        
+
         const convenantChecked = sessionStorage.getItem(`checked_convenant_${docId}`);
         if (convenantChecked === 'false') {
           // Add cross mark to Convenanten category
@@ -196,7 +196,7 @@
             crossMark.style.color = '#c62828';
             const title = convenantCard.querySelector('h3');
             if (title) title.appendChild(crossMark);
-            
+
             // Add a tooltip
             const tooltip = document.createElement('div');
             tooltip.textContent = 'Uit de wizard is gebleken dat dit waarschijnlijk geen convenant is.';
@@ -206,6 +206,13 @@
             const cardContent = convenantCard.querySelector('a, div');
             if (cardContent) cardContent.appendChild(tooltip);
           }
+        }
+      } else {
+        if (convenantLink) {
+          convenantLink.href = 'wizard.html';
+        }
+        if (adviescollegeLink) {
+          adviescollegeLink.href = 'wizard-adviescollege.html';
         }
       }
     });
