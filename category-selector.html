@@ -56,6 +56,19 @@
     .back-link:hover {
       text-decoration: underline;
     }
+    .publicatie-button {
+      display: none;
+      margin-top: 1rem;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .publicatie-button:hover {
+      background: #00437d;
+    }
   </style>
 </head>
 <body>
@@ -65,6 +78,7 @@
   <main class="container">
     <div class="page-header">
       <p>Kies hieronder bij welk type document het beste past. Elk type heeft een eigen wizard om u te helpen de juiste categorie te bepalen.</p>
+      <a id="publication-button" href="publicatie-stappen.html" class="publicatie-button">Publicatiestappen doorlopen</a>
     </div>
 
     <div class="category-grid">
@@ -170,12 +184,18 @@
     const urlParams = new URLSearchParams(window.location.search);
     const docId = urlParams.get('id');
     const fromWizard = urlParams.get('fromWizard') === 'true';
+    const noDoc = urlParams.get('noDoc') === 'true';
     
     // Check if we have a stored result for this document
     document.addEventListener('DOMContentLoaded', () => {
       // Set up the convenant and adviescollege links
       const convenantLink = document.getElementById('convenant-link');
       const adviescollegeLink = document.getElementById('adviescollege-link');
+      const publicationButton = document.getElementById('publication-button');
+
+      if (noDoc && publicationButton) {
+        publicationButton.style.display = 'inline-block';
+      }
       
       if (docId) {
         if (convenantLink) {
