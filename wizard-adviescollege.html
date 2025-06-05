@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wizard – Bepaal categorie Adviescollege</title>
+  <title>Wizard – Bepaal categorie Adviezen</title>
   <style>
     /* --- mobielvriendelijke basisopmaak --- */
     :root {
@@ -216,37 +216,54 @@
   console.log('Huidige locatie:', window.location.href);
 
   /* ============================================================
-     Beslisboom voor Adviescolleges
+     Beslisboom voor Adviezen
      ============================================================ */
   const FLOW = {
     start: "A-1",
     nodes: {
       "A-1": {
-        question: "Is het document afkomstig van een adviescollege?",
+        question: "Is het document een advies aan een bestuursorgaan of ministerie?",
         yes: "A-2",
-        no: "GEEN_ADVIESCOLLEGE"
+        no: "GEEN_ADVIES"
       },
       "A-2": {
-        question: "Is het een officieel adviesrapport van het college?",
+        question: "Betreft het een advies over ontwerpregelgeving of een ander beleidsvraagstuk?",
         yes: "A-3",
-        no: "A-4"
+        no: "GEEN_ADVIES"
       },
       "A-3": {
-        question: "Is het advies bestemd voor een overheidsinstantie?",
-        yes: "ADVIESCOLLEGE_RAPPORT",
-        no: "TWEEVRAAG"
+        question: "Is het advies afkomstig van een adviescollege, commissie of externe partij die daarom gevraagd is?",
+        yes: "A-4",
+        no: "GEEN_ADVIES"
       },
       "A-4": {
-        question: "Gaat het om interne notities of concepten?",
-        yes: "ADVIESCOLLEGE_INTERN",
-        no: "TWEEVRAAG"
+        question: "Gaat het advies over een individueel geval (zoals bezwaar of personeel)?",
+        yes: "NIET_OPENBAAR",
+        no: "A-5"
+      },
+      "A-5": {
+        question: "Is het advies een aanvulling of addendum op eerder advies?",
+        yes: "ADVIES_ADDENDUM",
+        no: "A-6"
+      },
+      "A-6": {
+        question: "Is dit de definitieve versie zoals vastgesteld of ontvangen?",
+        yes: "A-7",
+        no: "NOG_NIET_PUBLICEREN"
+      },
+      "A-7": {
+        question: "Bevat het advies vertrouwelijke info of persoonsgegevens?",
+        yes: "ANONIMISEER",
+        no: "ADVIES_OPENBAAR"
       }
     },
     results: {
-      "ADVIESCOLLEGE_RAPPORT": "Dit is een officieel adviesrapport van een adviescollege.",
-      "ADVIESCOLLEGE_INTERN": "Dit zijn interne notities of concepten van een adviescollege.",
-      "GEEN_ADVIESCOLLEGE": "Dit document lijkt geen betrekking te hebben op een adviescollege.",
-      "TWEEVRAAG": "Neem contact op met de afdeling voor een nadere beoordeling."
+      "ADVIES_OPENBAAR": "Advies openbaar \u2192 tag_ADVIEZEN",
+      "ADVIES_ADDENDUM": "Advies-addendum \u2192 tag_ADVIEZEN_ADDENDUM",
+      "GEEN_ADVIES": "Geen advies (buiten categorie)",
+      "NIET_OPENBAAR": "Uitzondering: niet openbaar",
+      "NOG_NIET_PUBLICEREN": "Nog niet publiceren",
+      "ANONIMISEER": "Anonimiseren of uitstellen \u2192 toets art. 5.1/5.2 Woo"
     }
   };
 
@@ -322,9 +339,9 @@
         btnWrap.append(button('Vorige vraag', 'btn-neutral', goBack));
       }
 
-      // Toon toewijsknop als het een adviescollege betreft
-      if ((key === 'ADVIESCOLLEGE_RAPPORT' || key === 'ADVIESCOLLEGE_INTERN') && docId) {
-        btnWrap.append(button('Categorie "Adviescollege" toewijzen', 'btn-yes', async () => {
+      // Toon toewijsknop bij positieve uitkomst
+      if ((key === 'ADVIES_OPENBAAR' || key === 'ADVIES_ADDENDUM') && docId) {
+        btnWrap.append(button('Categorie "Adviesstuk" toewijzen', 'btn-yes', async () => {
           const button = this.event?.target;
           const originalText = button?.textContent;
           
@@ -335,11 +352,11 @@
               button.textContent = 'Bezig met opslaan...';
             }
             
-            await assignCategory(docId, 'Adviescollege');
+            await assignCategory(docId, 'Adviesstuk');
             
             // Succesmelding tonen en doorverwijzen
             const successMsg = create('div', null, 'notification success');
-            successMsg.textContent = 'Categorie "Adviescollege" is succesvol toegewezen! Doorverwijzen...';
+            successMsg.textContent = 'Categorie "Adviesstuk" is succesvol toegewezen! Doorverwijzen...';
             wizard.prepend(successMsg);
             
             // Na 1,5 seconden doorverwijzen
